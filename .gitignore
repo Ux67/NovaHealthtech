@@ -1,0 +1,25 @@
+# Environment variables and API keys (CRITICAL FOR SECURITY)
+.env
+.env.local
+.env.*.local
+
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database files (for future milestones)
+*.db
+*.sqlite
+*.sqlite3
+
+# VS Code and OS metadata
+.vscode/
+.DS_Store
+Thumbs.db

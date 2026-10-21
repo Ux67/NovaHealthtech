@@ -1,0 +1,34 @@
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Secrets and environment files
+.env
+.env.*
+*.pem
+*.key
+
+# Local virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+nova_health.db
+
+# OS Artifacts
+.DS_Store
+Thumbs.db
