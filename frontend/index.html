@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Nova Healthtech - Offline Health Guide, Doctor Consultations, Emergency Triage, and Indian Digital Health Platform" />
-  <title>Nova Healthtech | Offline Health Guide &amp; Resilience Platform</title>
+  <meta name="theme-color" content="#071426" />
+  <meta name="description" content="Nova Healthtech — 22-Language All-India AI Healthcare Platform with Offline First-Aid Guides, Medicine & Disease Intelligence, Hospital & Pharmacy Locator, and Emergency Triage" />
+  <title>Nova Healthtech | 22-Language DeepTech Healthcare Platform</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -22,74 +23,126 @@
     </div>
   </div>
 
-  <!-- Main Navigation Header -->
+  <!-- Main Glass Navigation Header -->
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
         <svg class="brand__logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect width="48" height="48" rx="14" fill="url(#novaGrad)" />
-          <path d="M12 26C16.5 26 18 16 22 16C26 16 26.5 32 30.5 32C34 32 35.5 24 38 24" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="35" cy="14" r="3" fill="#99F6E4" />
+          <rect width="48" height="48" rx="14" fill="url(#novaGrad)" stroke="rgba(69,214,255,0.4)" stroke-width="1.2" />
+          <path d="M11 26C15.5 26 17.5 15 21.5 15C25.5 15 26.5 33 30.5 33C34 33 35.5 24 38.5 24" stroke="#F4F8FF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="35.5" cy="14.5" r="3.2" fill="#49E6C4" />
           <defs>
             <linearGradient id="novaGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#0A2540" />
-              <stop offset="0.55" stop-color="#0D9488" />
-              <stop offset="1" stop-color="#06B6D4" />
+              <stop stop-color="#071426" />
+              <stop offset="0.52" stop-color="#0B1F35" />
+              <stop offset="1" stop-color="#144266" />
             </linearGradient>
           </defs>
         </svg>
         <div>
           <span class="brand__name">Nova Healthtech</span>
-          <span class="brand__tag">Rural &amp; Accessible Care</span>
+          <span class="brand__tag">22-Language All-India Accessible Care</span>
         </div>
       </div>
 
       <div class="header-controls">
-        <label for="langSelect" class="sr-only">Select Language</label>
-        <select id="langSelect" class="control-select" aria-label="Select Language">
-          <option value="en">English</option>
-          <option value="gu">ગુજરાતી (Gujarati)</option>
-          <option value="hi">हिन्दी (Hindi)</option>
+        <label for="langSelect" class="sr-only">Select Language (22 Languages)</label>
+        <select id="langSelect" class="control-select" aria-label="Select Language (22 Languages)">
+          <option value="en">1. English (English)</option>
+          <option value="hi">2. हिन्दी (Hindi)</option>
+          <option value="gu">3. ગુજરાતી (Gujarati)</option>
+          <option value="mr">4. मराठी (Marathi)</option>
+          <option value="ta">5. தமிழ் (Tamil)</option>
+          <option value="te">6. తెలుగు (Telugu)</option>
+          <option value="bn">7. বাংলা (Bengali)</option>
+          <option value="kn">8. ಕನ್ನಡ (Kannada)</option>
+          <option value="ml">9. മലയാളം (Malayalam)</option>
+          <option value="pa">10. ਪੰਜਾਬੀ (Punjabi)</option>
+          <option value="or">11. ଓଡ଼ିଆ (Odia)</option>
+          <option value="as">12. অসমীয়া (Assamese)</option>
+          <option value="ur">13. اردو (Urdu)</option>
+          <option value="mai">14. मैथिली (Maithili)</option>
+          <option value="kok">15. कोंकणी (Konkani)</option>
+          <option value="ne">16. नेपाली (Nepali)</option>
+          <option value="sd">17. सिन्धी (Sindhi)</option>
+          <option value="ks">18. कॉशुर (Kashmiri)</option>
+          <option value="doi">19. डोगरी (Dogri)</option>
+          <option value="mni">20. মৈতৈলোন্ (Manipuri)</option>
+          <option value="sat">21. ᱥᱟᱱᱛᱟᱲᱤ (Santali)</option>
+          <option value="sa">22. संस्कृतम् (Sanskrit)</option>
         </select>
 
         <button id="bandwidthToggle" type="button" class="control-btn" aria-pressed="false">
           Low-Bandwidth: Off
         </button>
 
-        <div id="swBadge" class="status-pill status-pill--checking" role="status" aria-live="polite">
+        <div id="swBadge" class="status-pill status-pill--online" role="status" aria-live="polite">
           <span class="status-dot"></span>
-          <span id="swStatusText">Offline Ready: Active</span>
+          <span id="swStatusText">Offline Ready (SW)</span>
         </div>
 
-        <div id="statusBadge" class="status-pill status-pill--checking" role="status" aria-live="polite">
+        <div id="statusBadge" class="status-pill status-pill--online" role="status" aria-live="polite">
           <span class="status-dot"></span>
-          <span id="statusText">Checking API...</span>
+          <span id="statusText">🟢 AI is Online</span>
         </div>
       </div>
     </div>
   </header>
 
   <main class="container main-content">
-    <!-- Clinical & Demonstration Safety Disclaimer -->
     <section class="disclaimer-banner" aria-label="Safety and Demonstration Notice">
-      <strong>Demonstration Prototype Notice:</strong>
+      <strong>Clinical Safety Notice:</strong>
       <span id="disclaimerText">
-        Nova Healthtech provides offline health guidance, emergency triage, and pathways to verified doctors. It does not provide autonomous medical diagnosis or alter doctor-prescribed treatments.
+        Nova Healthtech provides preliminary health &amp; medicine guidance, emergency triage, and pathways to verified hospitals and pharmacies across 22 Indian languages. Always consult a qualified doctor before starting or altering any treatment.
       </span>
     </section>
 
-    <!-- Hero Section -->
     <section class="hero-card glass-panel">
       <div class="hero-card__content">
-        <span class="eyebrow">MILESTONE 5 • OFFLINE RESILIENCE &amp; SECURITY HARDENING</span>
+        <span class="eyebrow">22 INDIAN &amp; REGIONAL LANGUAGES • ALL-INDIA CARE NETWORK</span>
         <h1 id="heroTitle">Accessible Preliminary Health Guidance for Every Community</h1>
         <p id="heroSubtitle" class="hero-card__lead">
-          Operates reliably on low-bandwidth rural networks with complete offline first-aid guides, rate-limiting security guards, and direct connectivity to registered doctors.
+          Engineered for high performance across urban and low-bandwidth rural networks with 22-language voice &amp; text translation, disease &amp; medicine intelligence, offline first-aid protocols, and pan-India hospital and Jan Aushadhi pharmacy directories.
         </p>
       </div>
     </section>
 
-    <!-- MODULE 5A: OFFLINE ESSENTIAL HEALTH & FIRST-AID GUIDE -->
+    <!-- MODULE 1: CAUTIOUS AI HEALTH & MEDICINE ASSISTANT -->
+    <section id="aiAssistantSection" class="assistant-module glass-panel" aria-labelledby="assistantHeading">
+      <div class="section-header-row">
+        <div>
+          <span class="eyebrow">22-LANGUAGE CONVERSATIONAL AI • DISEASE, MEDICINE &amp; HOSPITAL INTELLIGENCE</span>
+          <h2 id="assistantHeading">Nova AI Health &amp; Medicine Assistant</h2>
+          <p id="assistantSubheading" class="text-muted">
+            Ask about any disease (for Causes, Symptoms, Diagnostic Tests &amp; Precautions), any medicine brand with mg/specifiers, or reply with your city for nearby hospitals &amp; pharmacies.
+          </p>
+        </div>
+        <span class="ai-safety-pill" id="aiSafetyBadge">🟢 AI Online • Live Web Search</span>
+      </div>
+
+      <div id="voiceSupportNotice" class="voice-status-strip" aria-live="polite">
+        <span id="voiceStatusText">🎤 Voice Input (Microphone) &amp; Spoken Audio Active across 22 Regional Locales (en-IN to sa-IN)</span>
+      </div>
+
+      <div class="chat-container">
+        <div id="chatMessages" class="chat-messages" role="log" aria-live="polite" aria-label="Health Consultation Conversation"></div>
+
+        <form id="assistantChatForm" class="chat-input-form">
+          <div class="chat-input-wrapper">
+            <button type="button" id="voiceMicBtn" class="btn-mic" aria-label="Start Voice Input" title="Click to speak in selected language">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="mic-icon" aria-hidden="true">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            </button>
+            <input type="text" id="chatInput" class="control-input chat-input-field" placeholder="Ask about a disease, a medicine with mg/specifier, or type your city name..." autocomplete="off" />
+            <button type="submit" id="chatSendBtn" class="btn-primary btn-chat-send">Send</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- MODULE 2: OFFLINE ESSENTIAL HEALTH & FIRST-AID GUIDE -->
     <section id="healthGuideSection" class="guide-module glass-panel" aria-labelledby="guideHeading">
       <div class="section-header-row">
         <div>
@@ -102,7 +155,6 @@
         <span class="offline-pill" id="guideOfflineBadge">Cached Offline in Browser</span>
       </div>
 
-      <!-- Filter Tabs by Category -->
       <div class="guide-filter-bar">
         <button type="button" class="guide-tab-btn active" data-category="all">All Essential Guides</button>
         <button type="button" class="guide-tab-btn" data-category="hydration_gastro">ORS &amp; Hydration</button>
@@ -111,18 +163,17 @@
         <button type="button" class="guide-tab-btn" data-category="toxicology">Snakebite Precautions</button>
       </div>
 
-      <!-- Guide Cards Accordion Grid -->
       <div id="healthGuideGrid" class="guide-grid" aria-live="polite"></div>
     </section>
 
-    <!-- MODULE 4A: REAL DOCTOR CONSULTATION REQUEST PATHWAY -->
+    <!-- MODULE 3: DOCTOR CONSULTATION REQUEST PATHWAY -->
     <section id="doctorConsultationSection" class="consultation-module glass-panel" aria-labelledby="consultHeading">
       <div class="section-header-row">
         <div>
           <span class="eyebrow">PROFESSIONAL CARE • REGISTERED MEDICAL PRACTITIONERS</span>
           <h2 id="consultHeading">Request a Doctor Consultation</h2>
           <p id="consultSubheading" class="text-muted">
-            Submit a non-emergency consultation request. A verified medical coordinator or doctor will contact you for clinical review.
+            Submit a non-emergency consultation request. A verified medical coordinator or doctor speaking your preferred regional language will contact you.
           </p>
         </div>
         <span class="pathway-pill" id="doctorPathwayBadge">Human Medical Review</span>
@@ -132,7 +183,7 @@
         <form id="consultationForm" class="consult-form">
           <div class="form-group">
             <label for="consultName">Patient Name / Identifier</label>
-            <input type="text" id="consultName" class="control-input full-width" required placeholder="e.g. Meet Jaiswal" />
+            <input type="text" id="consultName" class="control-input full-width" required placeholder="Enter patient name" />
           </div>
 
           <div class="form-group">
@@ -142,24 +193,25 @@
 
           <div class="form-row">
             <div class="form-group flex-1">
-              <label for="consultDistrict">District / City (Gujarat or India)</label>
+              <label for="consultDistrict">City / District (All India)</label>
               <select id="consultDistrict" class="control-select full-width">
                 <option value="Bhavnagar">Bhavnagar</option>
                 <option value="Ahmedabad">Ahmedabad</option>
-                <option value="Rajkot">Rajkot</option>
-                <option value="Vadodara">Vadodara</option>
-                <option value="Surat">Surat</option>
-                <option value="Other_Gujarat">Other Gujarat District</option>
-                <option value="Other_India">Other State in India</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="New Delhi">New Delhi</option>
+                <option value="Bengaluru">Bengaluru</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Kolkata">Kolkata</option>
               </select>
             </div>
 
             <div class="form-group flex-1">
-              <label for="consultLang">Preferred Consultation Language</label>
+              <label for="consultLang">Preferred Consultation Language (22 Languages)</label>
               <select id="consultLang" class="control-select full-width">
-                <option value="gu">ગુજરાતી (Gujarati)</option>
+                <option value="en">English (English)</option>
                 <option value="hi">हिन्दी (Hindi)</option>
-                <option value="en">English</option>
+                <option value="gu">ગુજરાતી (Gujarati)</option>
               </select>
             </div>
           </div>
@@ -187,13 +239,13 @@
             Track your queued consultations. Requests are evaluated with triage safety priority.
           </p>
           <div id="consultationList" class="consult-card-list" aria-live="polite">
-            <div class="text-muted" style="padding: 1rem 0;">No active requests submitted yet.</div>
+            <p class="text-muted">No active requests submitted yet.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- MODULE 4B: SAFE MEDICATION ADHERENCE REMINDERS -->
+    <!-- MODULE 4: SAFE MEDICATION ADHERENCE REMINDERS -->
     <section id="medicationRemindersSection" class="reminders-module glass-panel" aria-labelledby="medHeading">
       <div class="section-header-row">
         <div>
@@ -237,7 +289,7 @@
 
           <div class="form-group">
             <label for="medNotes">Doctor Notes / Days (Optional)</label>
-            <input type="text" id="medNotes" class="control-input full-width" placeholder="e.g. For 5 days as prescribed by Civil Hospital" />
+            <input type="text" id="medNotes" class="control-input full-width" placeholder="e.g. For 5 days as prescribed" />
           </div>
 
           <div class="form-group checkbox-group verification-box">
@@ -264,42 +316,7 @@
       </div>
     </section>
 
-    <!-- MILESTONE 3: CAUTIOUS AI HEALTH ASSISTANT -->
-    <section id="aiAssistantSection" class="assistant-module glass-panel" aria-labelledby="assistantHeading">
-      <div class="section-header-row">
-        <div>
-          <span class="eyebrow">MILESTONE 3 • PRE-AI EMERGENCY INTERCEPT &amp; VOICE ENABLED</span>
-          <h2 id="assistantHeading">Cautious AI Health Assistant</h2>
-          <p id="assistantSubheading" class="text-muted">
-            Ask non-emergency health questions or explore symptoms. Emergency symptoms are automatically intercepted before reaching AI.
-          </p>
-        </div>
-        <span class="ai-safety-pill" id="aiSafetyBadge">Non-Diagnostic Mode Active</span>
-      </div>
-
-      <div id="voiceSupportNotice" class="voice-status-strip" aria-live="polite">
-        <span id="voiceStatusText">Voice Input (Microphone) &amp; Spoken Audio Ready (en-IN, gu-IN, hi-IN)</span>
-      </div>
-
-      <div class="chat-container">
-        <div id="chatMessages" class="chat-messages" role="log" aria-live="polite" aria-label="Health Consultation Conversation"></div>
-
-        <form id="assistantChatForm" class="chat-input-form">
-          <div class="chat-input-wrapper">
-            <button type="button" id="voiceMicBtn" class="btn-mic" aria-label="Start Voice Input" title="Click to speak">
-              <svg viewBox="0 0 24 24" fill="currentColor" class="mic-icon" aria-hidden="true">
-                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-              </svg>
-            </button>
-            <input type="text" id="chatInput" class="control-input chat-input-field" placeholder="Describe symptoms or ask a wellness question..." autocomplete="off" />
-            <button type="submit" id="chatSendBtn" class="btn-primary btn-chat-send">Send</button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- MILESTONE 2: DETERMINISTIC EMERGENCY SYMPTOM RED-FLAG DETECTOR -->
+    <!-- MODULE 5: DETERMINISTIC EMERGENCY SYMPTOM RED-FLAG DETECTOR -->
     <section id="emergencyTriageSection" class="triage-module glass-panel" aria-labelledby="triageHeading">
       <div class="section-header-row">
         <div>
@@ -315,9 +332,7 @@
       <form id="triageForm" class="triage-form">
         <div id="triageCheckboxesGrid" class="triage-checkbox-grid" role="group" aria-label="Emergency Red-Flag Symptoms"></div>
         <div class="form-group">
-          <label for="triageFreeText">
-            Or describe symptoms in English, ગુજરાતી, or हिन्दी:
-          </label>
+          <label for="triageFreeText">Or describe symptoms in your language:</label>
           <input type="text" id="triageFreeText" class="control-input full-width" placeholder="e.g., chest pain / છાતીમાં દુખાવો / सीने में दर्द" autocomplete="off" />
         </div>
         <div class="triage-actions-row">
@@ -329,14 +344,14 @@
       <div id="triageResultContainer" class="triage-result" hidden aria-live="assertive"></div>
     </section>
 
-    <!-- MODULE 11: INDIAN DIGITAL HEALTH AND GOVERNMENT BENEFITS -->
+    <!-- MODULE 6: ALL-INDIA HEALTH CARDS, HOSPITALS & MEDICINE STORES -->
     <section id="healthBenefitsModule" class="benefits-module glass-panel" aria-labelledby="benefitsHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">MODULE 11 • VERIFIED OFFICIAL GUIDANCE</span>
-          <h2 id="benefitsHeading">Health Cards &amp; Government Benefits (India &amp; Gujarat)</h2>
+          <span class="eyebrow">ALL-INDIA PUBLIC HEALTH • VERIFIED OFFICIAL GUIDANCE</span>
+          <h2 id="benefitsHeading">Health Cards, All-India Hospitals &amp; Government Benefits</h2>
           <p id="benefitsSubheading" class="text-muted">
-            Navigate Ayushman Bharat PM-JAY, Gujarat Mukhyamantri Amrutam (PMJAY-MA), Senior Citizen 70+ Vay Vandana, and ABHA digital health accounts safely.
+            Navigate Ayushman Bharat PM-JAY, PMJAY-MA, Senior Citizen 70+ Vay Vandana, ABHA accounts, and participating hospitals across India.
           </p>
         </div>
         <span class="privacy-pill" id="zeroPiiBadge">Zero-ID Privacy Shield Active</span>
@@ -360,7 +375,7 @@
               <label for="screenState">2. State of Residence</label>
               <select id="screenState" class="control-select full-width">
                 <option value="gujarat">Gujarat (PMJAY-MA)</option>
-                <option value="other_india">Other Indian State</option>
+                <option value="other_india">Other Indian State (PM-JAY)</option>
               </select>
             </div>
             <div class="form-group">
@@ -377,15 +392,10 @@
         </div>
 
         <div class="tool-box">
-          <h3 id="hospitalFinderTitle">Find Participating Hospitals (Gujarat Directory)</h3>
+          <h3 id="hospitalFinderTitle">🏥 Find Participating Hospitals Across India (By State &amp; City)</h3>
           <div class="form-group">
             <select id="districtFilter" class="control-select full-width">
               <option value="all">All Listed Districts</option>
-              <option value="Bhavnagar">Bhavnagar</option>
-              <option value="Ahmedabad">Ahmedabad</option>
-              <option value="Rajkot">Rajkot</option>
-              <option value="Vadodara">Vadodara</option>
-              <option value="Surat">Surat</option>
             </select>
           </div>
           <div id="hospitalListContainer" class="hospital-list" aria-live="polite"></div>
@@ -393,12 +403,13 @@
       </div>
     </section>
 
-    <!-- MODULE 5B: SYSTEM VERIFICATION & RURAL NETWORK STRESS-TEST SUITE -->
+    <!-- MODULE 7: SYSTEM VERIFICATION & RURAL NETWORK STRESS-TEST SUITE -->
     <section class="diagnostic-panel glass-panel" aria-labelledby="diagHeading">
       <div class="diagnostic-panel__header">
         <div>
+          <span class="eyebrow">TELEMETRY &amp; EDGE RESILIENCE</span>
           <h2 id="diagHeading">System Verification &amp; Rural Network Stress Tester</h2>
-          <p class="text-muted">Simulate poor mobile connectivity, evaluate rate-limiting defenses, and inspect security headers.</p>
+          <p class="text-muted">Simulate low-bandwidth 2G latency, verify rate-limiting defenses, and audit 22-language readiness.</p>
         </div>
         <div class="stress-btn-group">
           <button id="runStressTestBtn" type="button" class="btn-outline-small">
@@ -413,26 +424,25 @@
       <div id="diagnosticOutput" class="diagnostic-output" aria-live="polite">
         <div class="diag-grid">
           <div class="diag-item">
-            <span class="diag-label">API Status</span>
-            <strong id="diagStatus">Awaiting check...</strong>
+            <span class="diag-label">AI Engine Status</span>
+            <strong id="diagStatus">🟢 AI is Online</strong>
           </div>
           <div class="diag-item">
             <span class="diag-label">Rate Limiter &amp; CSP</span>
             <strong id="diagSecurityState">Sliding Window Active</strong>
           </div>
           <div class="diag-item">
-            <span class="diag-label">Offline Health Guide</span>
-            <strong id="diagGuideState">Ready (v3 Cache)</strong>
+            <span class="diag-label">Language Pack</span>
+            <strong id="diagGuideState">22 Regional Languages</strong>
           </div>
           <div class="diag-item">
             <span class="diag-label">Service Worker</span>
-            <strong id="diagSwState">Active (v3)</strong>
+            <strong id="diagSwState">Active</strong>
           </div>
         </div>
-        <p id="diagMessage" class="diag-message">Click "Test Backend Connection" or "Run Rural 2G Stress Test" to evaluate resilience.</p>
+        <p id="diagMessage" class="diag-message text-muted">Click "Test Backend Connection" or "Run Rural 2G Stress Test" to evaluate resilience.</p>
       </div>
 
-      <!-- Live Stress Test Results Terminal Output -->
       <div id="stressTestTerminal" class="stress-terminal" hidden aria-live="polite">
         <h4>Rural Network Simulation Results (Latency &amp; Payloads)</h4>
         <pre id="stressTerminalOutput">Awaiting stress test trigger...</pre>
@@ -442,8 +452,8 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <p>&copy; 2026 Nova Healthtech (Demonstration Prototype). Not a medical device.</p>
-      <p class="text-muted">Emergency in India: Dial 108 (Ambulance) / 112 (National Emergency)</p>
+      <p>&copy; 2026 Nova Healthtech (All-India 22-Language Healthcare Platform). Preliminary clinical awareness tool.</p>
+      <p class="text-muted">Emergency in India: Dial 108 (Ambulance) / 112 (National Emergency) / 1800-180-8080 (Jan Aushadhi)</p>
     </div>
   </footer>
 

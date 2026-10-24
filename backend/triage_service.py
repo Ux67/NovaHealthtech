@@ -177,126 +177,127 @@ def evaluate_emergency_triage(
     lang: str = "en",
 ) -> Dict[str, Any]:
     """
-    Deterministic red-flag evaluation.
-    Checks both user-selected checkboxes and multilingual free-text keywords.
-    Never performs medical diagnosis; strictly screens for immediate emergency transport needs.
+    Preliminary emergency keyword screening only.
+    A missing keyword match does NOT mean the person is safe.
     """
-    lang_code = lang if lang in ("en", "gu", "hi") else "en"
-    normalized_text = (free_text or "").strip().lower()
-    selected_set = set(selected_rule_ids or [])
 
-    matched_rules: List[Dict[str, str]] = []
+    lang_code = lang if lang in ("en", "gu", "hi") else "en"
+    text = (free_text or "").strip().lower()
+    selected = set(selected_rule_ids or [])
+
+    matched_rules = []
 
     for rule in RED_FLAG_RULES:
-        rule_id = rule["id"]
-        is_checked = rule_id in selected_set
-        is_keyword_match = any(
-            kw.lower() in normalized_text for kw in rule["keywords"]
-        ) if normalized_text else False
+        # Explicitly selected red flags always trigger the safety gate.
+        checked = rule["id"] in selected
 
-        if is_checked or is_keyword_match:
-            localized = rule["i18n"].get(lang_code, rule["i18n"]["en"])
-            matched_rules.append(
-                {
-                    "id": rule_id,
-                    "symptom": localized["label"],
-                    "immediate_action": localized["action"],
-                }
+        # Retain the existing multilingual keyword catalogue.
+        keyword_match = any(
+            keyword.lower() in text
+            for keyword in rule["keywords"]
+        )
+
+        if checked or keyword_match:
+            localized = rule["i18n"].get(
+                lang_code, rule["i18n"]["en"]
             )
+            matched_rules.append({
+                "id": rule["id"],
+                "symptom": localized["label"],
+                "immediate_action": localized["action"],
+            })
 
-    # Case 1: One or more deterministic emergency red flags triggered
+    emergency_numbers = {
+        "ambulance": "108",
+        "national_emergency": "112",
+    }
+
     if matched_rules:
-        headers = {
-            "en": "CRITICAL RED FLAG DETECTED: Immediate Emergency Medical Attention Required",
-            "gu": "ગંભીર જોખમી લક્ષણો જણાયેલ છે: તાત્કાલિક ઈમરજન્સી સારવાર જરૂરી છે",
-            "hi": "गंभीर खतरे के लक्षण मिले हैं: तुरंत आपातकालीन चिकित्सा सहायता आवश्यक है",
-        }
-        summaries = {
+        translations = {
             "en": (
-                "Do NOT wait for online chat or AI guidance. Call 108 (Ambulance) or 112 "
-                "immediately or go to the nearest Government Civil Hospital Emergency Ward."
-            ),
-            "gu": (
-                "ઓનલાઇન ચેટ કે AI માર્ગદર્શનની રાહ ન જુઓ. તાત્કાલિક 108 (એમ્બ્યુલન્સ) અથવા 112 પર કોલ કરો "
-                "અથવા નજીકની સરકારી સિવિલ હોસ્પિટલના તાત્કાલિક વિભાગમાં જાઓ."
+                "A listed emergency warning sign was detected. "
+                "Seek emergency medical help now. Call 108 or 112."
             ),
             "hi": (
-                "ऑनलाइन चैट या AI मार्गदर्शन की प्रतीक्षा न करें। तुरंत 108 (एम्बुलेंस) या 112 पर कॉल करें "
-                "या नजदीकी सरकारी सिविल अस्पताल के आपातकालीन वार्ड में जाएं।"
+                "आपातकालीन खतरे का संकेत मिला है। तुरंत चिकित्सा "
+                "सहायता लें। 108 या 112 पर कॉल करें।"
+            ),
+            "gu": (
+                "ઇમરજન્સીનું જોખમી લક્ષણ જણાયું છે. તાત્કાલિક "
+                "તબીબી મદદ લો. 108 અથવા 112 પર કોલ કરો."
             ),
         }
+
+        headlines = {
+            "en": "Emergency Warning Sign Detected",
+            "hi": "आपातकालीन खतरे का संकेत मिला",
+            "gu": "ઇમરજન્સીનું જોખમી લક્ષણ જણાયું",
+        }
+
         return {
             "urgency_level": "CRITICAL_EMERGENCY",
             "block_ai_assistant": True,
-            "emergency_numbers": {"ambulance": "108", "national_emergency": "112"},
-            "headline": headers[lang_code],
-            "summary": summaries[lang_code],
+            "emergency_numbers": emergency_numbers,
+            "headline": headlines[lang_code],
+            "summary": translations[lang_code],
             "matched_red_flags": matched_rules,
             "clinical_disclaimer": (
-                "Deterministic rule-based emergency alert. Not a clinical diagnosis."
+                "Automated keyword screening only; not a diagnosis."
             ),
         }
 
-    # Case 2: User typed non-empty symptom text, but no immediate 108 red flag matched
-    if normalized_text:
-        headers = {
-            "en": "No Immediate Red-Flag Matched — Consult a Qualified Doctor",
-            "gu": "તાત્કાલિક 108 જોખમી લક્ષણ જણાયેલ નથી — પરંતુ ડોક્ટરની સલાહ લો",
-            "hi": "तत्काल खतरे का संकेत नहीं मिला — फिर भी योग्य डॉक्टर से परामर्श लें",
-        }
-        summaries = {
-            "en": (
-                "Your entry did not match our emergency checklist, but automated screening cannot "
-                "rule out serious medical conditions. If symptoms worsen or feel severe, call 108 "
-                "or visit a doctor promptly."
-            ),
-            "gu": (
-                "તમારી વિગતમાં અમારા ઈમરજન્સી ચેકલિસ્ટના લક્ષણો જણાયા નથી, પરંતુ આ તપાસ રોગનું નિદાન કરતી નથી. "
-                "જો તકલીફ વધે તો તરત જ ડોક્ટરનો સંપર્ક કરો અથવા 108 પર કોલ કરો."
-            ),
-            "hi": (
-                "आपका विवरण हमारी आपातकालीन सूची से मेल नहीं खाता, लेकिन यह जांच किसी बीमारी की संभावना को "
-                "समाप्त नहीं करती। यदि लक्षण बढ़ें तो तुरंत डॉक्टर से मिलें या 108 पर कॉल करें।"
-            ),
-        }
+    if not text:
         return {
-            "urgency_level": "URGENT_DOCTOR_EVALUATION",
+            "urgency_level": "PRELIMINARY_NON_EMERGENCY",
             "block_ai_assistant": False,
-            "emergency_numbers": {"ambulance": "108", "national_emergency": "112"},
-            "headline": headers[lang_code],
-            "summary": summaries[lang_code],
+            "emergency_numbers": emergency_numbers,
+            "headline": {
+                "en": "Describe Your Symptoms",
+                "hi": "अपने लक्षण बताएं",
+                "gu": "તમારાં લક્ષણો જણાવો",
+            }[lang_code],
+            "summary": {
+                "en": "Describe your symptoms to begin preliminary guidance.",
+                "hi": "प्रारंभिक मार्गदर्शन के लिए अपने लक्षण बताएं।",
+                "gu": "પ્રારંભિક માર્ગદર્શન માટે તમારાં લક્ષણો જણાવો.",
+            }[lang_code],
             "matched_red_flags": [],
             "clinical_disclaimer": (
-                "Screening checks only for listed emergency keywords and cannot diagnose or rule out illness."
+                "This screening cannot diagnose or rule out illness."
             ),
         }
 
-    # Case 3: No symptoms selected or entered
-    headers = {
-        "en": "No Emergency Red Flags Selected",
-        "gu": "કોઈ જોખમી લક્ષણ પસંદ કરેલ નથી",
-        "hi": "कोई आपातकालीन लक्षण नहीं चुना गया",
-    }
-    summaries = {
-        "en": (
-            "Select any symptom above or describe what you are experiencing to check for "
-            "immediate emergency warning signs."
-        ),
-        "gu": (
-            "તાત્કાલિક જોખમી લક્ષણો તપાસવા માટે ઉપરમાંથી લક્ષણ પસંદ કરો અથવા નીચે લખો."
-        ),
-        "hi": (
-            "आपातकालीन चेतावनी संकेतों की जांच के लिए ऊपर से कोई लक्षण चुनें या नीचे लिखें।"
-        ),
-    }
+    # No listed emergency keyword matched.
+    # This is NOT the same as confirming that the symptoms are harmless.
     return {
         "urgency_level": "PRELIMINARY_NON_EMERGENCY",
         "block_ai_assistant": False,
-        "emergency_numbers": {"ambulance": "108", "national_emergency": "112"},
-        "headline": headers[lang_code],
-        "summary": summaries[lang_code],
+        "emergency_numbers": emergency_numbers,
+        "headline": {
+            "en": "Continue to Symptom Assessment",
+            "hi": "लक्षणों का आकलन जारी रखें",
+            "gu": "લક્ષણોનું મૂલ્યાંકન ચાલુ રાખો",
+        }[lang_code],
+        "summary": {
+            "en": (
+                "No listed emergency keyword was detected. "
+                "This does not rule out a serious condition. "
+                "Continue to the symptom assessment."
+            ),
+            "hi": (
+                "सूची में कोई आपातकालीन शब्द नहीं मिला। इससे "
+                "गंभीर बीमारी की संभावना समाप्त नहीं होती। "
+                "लक्षणों का आकलन जारी रखें।"
+            ),
+            "gu": (
+                "યાદીમાં કોઈ ઇમરજન્સી કીવર્ડ મળ્યો નથી. તેથી "
+                "ગંભીર બીમારીની શક્યતા નકારી શકાતી નથી. "
+                "લક્ષણોનું મૂલ્યાંકન ચાલુ રાખો."
+            ),
+        }[lang_code],
         "matched_red_flags": [],
         "clinical_disclaimer": (
-            "Demonstration screening tool only. Not a substitute for professional medical evaluation."
+            "Keyword screening only. Not a diagnosis or a "
+            "reliable method of ruling out emergencies."
         ),
     }
