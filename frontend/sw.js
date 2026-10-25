@@ -1,63 +1,49 @@
 /**
- * Nova Healthtech - Network-First Service Worker (sw.js - v4)
- * Always serves fresh local changes when Flask is running,
- * and falls back to offline cache immediately when Flask/internet is disconnected.
+ * Nova Healthtech - Network-First Service Worker (v22)
+ * Always fetches fresh code and live API responses when online,
+ * and falls back to cache only when genuinely offline.
  */
 
-const CACHE_NAME = "nova-live-cache-v4";
-
-const CORE_ASSETS = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/script.js",
-  "/api/benefits/catalog",
-  "/api/triage/rules",
-  "/api/guide/catalog",
-];
+const CACHE_NAME = "nova-healthtech-network-first-v22";
+const CORE_ASSETS = ["/", "/index.html", "/style.css?v=22lang", "/script.js?v=22lang"];
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(CORE_ASSETS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)).catch(() => {})
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : null))
-        )
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       )
-      .then(() => self.clients.claim())
+    ).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  if (request.method !== "GET") return;
+  const req = event.request;
 
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  // Never intercept POST/DELETE requests or live translation/AI API calls
+  if (req.method !== "GET" || req.url.includes("/api/")) {
+    return;
+  }
 
-  // Network-First for everything: live when online, cached when offline
+  // Network-First strategy for all GET assets
   event.respondWith(
-    fetch(request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return networkResponse;
+    fetch(req)
+      .then((networkRes) => {
+        const copy = networkRes.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {});
+        return networkRes;
       })
-      .catch(async () => {
-        const cached = await caches.match(request);
-        return cached || caches.match("/index.html");
-      })
+      .catch(() => caches.match(req))
   );
 });

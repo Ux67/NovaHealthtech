@@ -4,21 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#071426" />
-  <meta name="description" content="Nova Healthtech — 22-Language All-India AI Healthcare Platform with Offline First-Aid Guides, Medicine & Disease Intelligence, Hospital & Pharmacy Locator, and Emergency Triage" />
+  <meta name="description" content="Nova Healthtech — 22-Language All-India Accessible Healthcare Platform with Automatic Accident Detection & Emergency SOS" />
   <title>Nova Healthtech | 22-Language DeepTech Healthcare Platform</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2026master" />
 </head>
 <body>
   <!-- Deterministic Emergency Bar -->
   <div class="emergency-bar" role="region" aria-label="Emergency Assistance">
     <div class="container emergency-bar__content">
-      <span class="emergency-bar__badge">EMERGENCY</span>
-      <p class="emergency-bar__text" id="emergencyText">
+      <span class="emergency-bar__badge" id="emergencyBadge" data-i18n="emergency.badge">EMERGENCY</span>
+      <p class="emergency-bar__text" id="emergencyText" data-i18n="emergency.text">
         Chest pain, severe bleeding, or difficulty breathing? Do not wait for online guidance.
       </p>
       <div class="emergency-bar__actions">
-        <a href="tel:108" class="btn-emergency" aria-label="Call 108 Ambulance Service">Call 108 (Ambulance)</a>
-        <a href="tel:112" class="btn-emergency btn-emergency--secondary" aria-label="Call 112 National Emergency">Call 112</a>
+        <a href="tel:108" class="btn-emergency" id="call108Btn" data-i18n="emergency.call_108">Call 108 (Ambulance)</a>
+        <a href="tel:112" class="btn-emergency btn-emergency--secondary" id="call112Btn" data-i18n="emergency.call_112">Call 112</a>
       </div>
     </div>
   </div>
@@ -40,70 +40,154 @@
           </defs>
         </svg>
         <div>
-          <span class="brand__name">Nova Healthtech</span>
-          <span class="brand__tag">22-Language All-India Accessible Care</span>
+          <span class="brand__name" id="brandNameTitle">Nova Healthtech</span>
+          <span class="brand__tag" id="brandTagSubtitle" data-i18n="header.tagline">22-Language All-India Accessible Care</span>
         </div>
       </div>
 
       <div class="header-controls">
-        <label for="langSelect" class="sr-only">Select Language (22 Languages)</label>
-        <select id="langSelect" class="control-select" aria-label="Select Language (22 Languages)">
-          <option value="en">1. English (English)</option>
-          <option value="hi">2. हिन्दी (Hindi)</option>
-          <option value="gu">3. ગુજરાતી (Gujarati)</option>
-          <option value="mr">4. मराठी (Marathi)</option>
-          <option value="ta">5. தமிழ் (Tamil)</option>
-          <option value="te">6. తెలుగు (Telugu)</option>
-          <option value="bn">7. বাংলা (Bengali)</option>
-          <option value="kn">8. ಕನ್ನಡ (Kannada)</option>
-          <option value="ml">9. മലയാളം (Malayalam)</option>
-          <option value="pa">10. ਪੰਜਾਬੀ (Punjabi)</option>
-          <option value="or">11. ଓଡ଼ିଆ (Odia)</option>
-          <option value="as">12. অসমীয়া (Assamese)</option>
-          <option value="ur">13. اردو (Urdu)</option>
-          <option value="mai">14. मैथिली (Maithili)</option>
-          <option value="kok">15. कोंकणी (Konkani)</option>
-          <option value="ne">16. नेपाली (Nepali)</option>
-          <option value="sd">17. सिन्धी (Sindhi)</option>
-          <option value="ks">18. कॉशुर (Kashmiri)</option>
-          <option value="doi">19. डोगरी (Dogri)</option>
-          <option value="mni">20. মৈতৈলোন্ (Manipuri)</option>
-          <option value="sat">21. ᱥᱟᱱᱛᱟᱲᱤ (Santali)</option>
-          <option value="sa">22. संस्कृतम् (Sanskrit)</option>
-        </select>
+        <label for="langSelect" class="sr-only" data-i18n="lang.select_label">Select Your Language (22 Languages):</label>
+        <select id="langSelect" class="control-select" aria-label="Select Language (22 Languages)"></select>
 
-        <button id="bandwidthToggle" type="button" class="control-btn" aria-pressed="false">
+        <button id="bandwidthToggle" type="button" class="control-btn" aria-pressed="false" data-i18n="header.bandwidth_off">
           Low-Bandwidth: Off
         </button>
 
         <div id="swBadge" class="status-pill status-pill--online" role="status" aria-live="polite">
           <span class="status-dot"></span>
-          <span id="swStatusText">Offline Ready (SW)</span>
+          <span id="swStatusText" data-i18n="header.sw_ready">Offline Ready (SW)</span>
         </div>
 
         <div id="statusBadge" class="status-pill status-pill--online" role="status" aria-live="polite">
           <span class="status-dot"></span>
-          <span id="statusText">🟢 AI is Online</span>
+          <span id="statusText" data-i18n="header.ai_online">🟢 AI is Online</span>
         </div>
       </div>
     </div>
   </header>
 
   <main class="container main-content">
-    <section class="disclaimer-banner" aria-label="Safety and Demonstration Notice">
-      <strong>Clinical Safety Notice:</strong>
-      <span id="disclaimerText">
-        Nova Healthtech provides preliminary health &amp; medicine guidance, emergency triage, and pathways to verified hospitals and pharmacies across 22 Indian languages. Always consult a qualified doctor before starting or altering any treatment.
+    <section class="disclaimer-banner" aria-label="Safety Notice">
+      <strong id="disclaimerStrong" data-i18n="disclaimer.title">Clinical Safety Notice:</strong>
+      <span id="disclaimerText" data-i18n="disclaimer.body">
+        Nova Healthtech provides preliminary health and medicine guidance, emergency triage, and pathways to verified hospitals and pharmacies across 22 Indian languages. Always consult a qualified doctor before starting or altering any treatment.
       </span>
     </section>
 
     <section class="hero-card glass-panel">
       <div class="hero-card__content">
-        <span class="eyebrow">22 INDIAN &amp; REGIONAL LANGUAGES • ALL-INDIA CARE NETWORK</span>
-        <h1 id="heroTitle">Accessible Preliminary Health Guidance for Every Community</h1>
-        <p id="heroSubtitle" class="hero-card__lead">
-          Engineered for high performance across urban and low-bandwidth rural networks with 22-language voice &amp; text translation, disease &amp; medicine intelligence, offline first-aid protocols, and pan-India hospital and Jan Aushadhi pharmacy directories.
+        <span class="eyebrow" id="heroEyebrow" data-i18n="hero.eyebrow">22 INDIAN &amp; REGIONAL LANGUAGES • ALL-INDIA CARE NETWORK</span>
+        <h1 id="heroTitle" data-i18n="hero.title">Accessible Preliminary Health Guidance for Every Community</h1>
+        <p id="heroSubtitle" class="hero-card__lead" data-i18n="hero.subtitle">
+          Engineered for high performance across urban and low-bandwidth rural networks with 22-language voice and text translation, automatic accident detection &amp; emergency SOS, disease and medicine intelligence, offline first-aid protocols, and pan-India hospital and Jan Aushadhi pharmacy directories.
         </p>
+      </div>
+    </section>
+
+    <!-- MODULE 0: AUTOMATIC ACCIDENT DETECTION, 8-SECOND AUTO-CALL & REAL GPS LOCATION TRANSMISSION -->
+    <section id="sosEmergencyModule" class="triage-module glass-panel" aria-labelledby="sosHeading" style="border: 1px solid rgba(255, 92, 119, 0.45);">
+      <div class="section-header-row">
+        <div>
+          <span class="eyebrow" style="color: #ff7b93;">AUTO-ACTIVE SENSOR-FUSION MONITOR • 8s AUTO-AMBULANCE CALL &amp; LIVE GPS</span>
+          <h2 id="sosHeading">🚨 Automatic Accident Detection &amp; Emergency SOS Center</h2>
+          <p class="text-muted">
+            Foreground crash sensor monitoring is automatically active while this website is open. On impact or SOS trigger, an 8-second countdown starts and automatically shares your GPS location and calls 108 (Ambulance) unless cancelled.
+          </p>
+        </div>
+        <div id="sosMonitorBadge" class="status-pill status-pill--online" role="status" aria-live="polite">
+          <span class="status-dot"></span>
+          <span id="sosMonitorStatusText">🟢 Foreground Sensor Monitor: Active (Auto-Started)</span>
+        </div>
+      </div>
+
+      <div class="benefits-tools-grid" style="margin-top: 1rem;">
+        <!-- Left Box: Manual SOS, Sensor Toggle, Safe Simulator & Live GPS -->
+        <div class="tool-box">
+          <h3>1. Emergency SOS &amp; Sensor Controls</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; margin: 0.75rem 0;">
+            <button type="button" id="manualSosBtn" class="btn-danger-check" style="background: #e11d48; font-weight: 700;">
+              🚨 TRIGGER EMERGENCY SOS NOW
+            </button>
+            <button type="button" id="toggleSensorMonitorBtn" class="btn-primary">
+              ⏹ Disable Foreground Sensor Monitoring
+            </button>
+            <button type="button" id="refreshGpsBtn" class="control-btn">
+              📍 Acquire Live GPS Coordinates
+            </button>
+          </div>
+
+          <div class="form-group checkbox-group" style="margin-top: 0.5rem;">
+            <input type="checkbox" id="sosSafeSimulationToggle" />
+            <label for="sosSafeSimulationToggle">
+              <strong>Safe Simulation / Test Mode:</strong> Check this box only if you want to test without placing the automatic 108 phone call.
+            </label>
+          </div>
+
+          <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p class="small-note text-muted" style="margin-bottom: 0.45rem;">
+              <strong>Safe Sensor Trace Simulator (No Real Drop/Crash Required):</strong>
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.45rem;">
+              <button type="button" id="simRoutineBumpBtn" class="btn-outline-small">Simulate Routine Bump (11 m/s²)</button>
+              <button type="button" id="simPhoneDropBtn" class="btn-outline-small">Simulate Phone Drop (24 m/s²)</button>
+              <button type="button" id="simSevereCrashBtn" class="btn-outline-small" style="border-color: #ff7b93; color: #ff99ac;">Simulate Severe Impact (38 m/s² + Gyro)</button>
+            </div>
+          </div>
+
+          <div id="sosLiveLocationBox" class="screener-results" style="margin-top: 0.85rem;">
+            <p id="sosLocationStatusLine"><strong>📍 GPS Status:</strong> Automatically acquiring live coordinates...</p>
+            <div id="sosLocationActions" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;"></div>
+            <div class="form-group" style="margin-top: 0.6rem;">
+              <label for="sosManualAddressInput" class="small-note">Fallback Manual Location / Landmark (if GPS is denied or indoors):</label>
+              <input type="text" id="sosManualAddressInput" class="control-input full-width" placeholder="e.g., NH-51 Near Panwadi Circle, Bhavnagar, Gujarat" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Box: 8-Second Countdown Banner, Dispatch Status & Trusted Contacts -->
+        <div class="tool-box">
+          <h3>2. Incident Status &amp; Trusted Emergency Contacts</h3>
+
+          <!-- Active 8-Second Countdown Box -->
+          <div id="sosCountdownModal" class="triage-result triage-result--critical" hidden aria-live="assertive" style="margin-bottom: 1rem;">
+            <h3 id="sosAlertHeadline">🚨 IMPACT / SOS DETECTED — AUTO-CALLING AMBULANCE (108)</h3>
+            <p id="sosAlertDetails">Acquiring &amp; sharing live GPS location with Ambulance (108)...</p>
+            <p style="font-size: 1.35rem; font-weight: 800; margin: 0.5rem 0;">
+              Auto-Calling 108 &amp; Sharing Location in <span id="sosCountdownSeconds">8</span> seconds...
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem;">
+              <button type="button" id="cancelSosCountdownBtn" class="btn-primary" style="background: #10b981; border-color: #10b981; font-weight: 800;">
+                ✓ CANCEL — I AM SAFE (STOP AUTO-CALL)
+              </button>
+              <a href="tel:108" id="sosDirectCall108" class="btn-emergency">📞 Call 108 Immediately</a>
+              <a href="tel:112" id="sosDirectCall112" class="btn-emergency btn-emergency--secondary">📞 Call 112 (ERSS)</a>
+            </div>
+          </div>
+
+          <div id="sosDispatchReportBox" class="screener-results" hidden style="margin-bottom: 1rem;"></div>
+
+          <form id="trustedContactForm" class="screener-form">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="trustedName">Trusted Contact Name</label>
+                <input type="text" id="trustedName" class="control-input full-width" required placeholder="e.g. Family Member" />
+              </div>
+              <div class="form-group flex-1">
+                <label for="trustedPhone">10-Digit Mobile Number</label>
+                <input type="tel" id="trustedPhone" class="control-input full-width" required placeholder="e.g. 9876543210" />
+              </div>
+            </div>
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="trustedConsent" required checked />
+              <label for="trustedConsent" class="small-note">
+                I have informed this contact and consent to sharing my SOS coordinates with them during an incident.
+              </label>
+            </div>
+            <button type="submit" class="btn-outline-small">➕ Save Trusted Contact</button>
+          </form>
+
+          <div id="trustedContactsList" style="margin-top: 0.75rem;"></div>
+        </div>
       </div>
     </section>
 
@@ -111,17 +195,17 @@
     <section id="aiAssistantSection" class="assistant-module glass-panel" aria-labelledby="assistantHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">22-LANGUAGE CONVERSATIONAL AI • DISEASE, MEDICINE &amp; HOSPITAL INTELLIGENCE</span>
-          <h2 id="assistantHeading">Nova AI Health &amp; Medicine Assistant</h2>
-          <p id="assistantSubheading" class="text-muted">
-            Ask about any disease (for Causes, Symptoms, Diagnostic Tests &amp; Precautions), any medicine brand with mg/specifiers, or reply with your city for nearby hospitals &amp; pharmacies.
+          <span class="eyebrow" id="assistantEyebrow" data-i18n="ai.eyebrow">22-LANGUAGE CONVERSATIONAL AI • DISEASE, MEDICINE &amp; HOSPITAL INTELLIGENCE</span>
+          <h2 id="assistantHeading" data-i18n="ai.heading">Nova AI Health &amp; Medicine Assistant</h2>
+          <p id="assistantSubheading" class="text-muted" data-i18n="ai.subheading">
+            Ask about any disease (for Causes, Symptoms, Diagnostic Tests, Precautions, Doctor &amp; Hospital Recommendations), any medicine brand with mg/specifiers, or reply with your city for nearby hospitals &amp; pharmacies.
           </p>
         </div>
-        <span class="ai-safety-pill" id="aiSafetyBadge">🟢 AI Online • Live Web Search</span>
+        <span class="ai-safety-pill" id="aiSafetyBadge" data-i18n="ai.badge">🟢 AI Online • Live Web Search</span>
       </div>
 
       <div id="voiceSupportNotice" class="voice-status-strip" aria-live="polite">
-        <span id="voiceStatusText">🎤 Voice Input (Microphone) &amp; Spoken Audio Active across 22 Regional Locales (en-IN to sa-IN)</span>
+        <span id="voiceStatusText" data-i18n="ai.voice_status">🎤 Voice Input (Microphone) &amp; Spoken Audio Active across 22 Regional Locales</span>
       </div>
 
       <div class="chat-container">
@@ -129,14 +213,14 @@
 
         <form id="assistantChatForm" class="chat-input-form">
           <div class="chat-input-wrapper">
-            <button type="button" id="voiceMicBtn" class="btn-mic" aria-label="Start Voice Input" title="Click to speak in selected language">
+            <button type="button" id="voiceMicBtn" class="btn-mic" aria-label="Start Voice Input" title="Speak">
               <svg viewBox="0 0 24 24" fill="currentColor" class="mic-icon" aria-hidden="true">
                 <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
               </svg>
             </button>
-            <input type="text" id="chatInput" class="control-input chat-input-field" placeholder="Ask about a disease, a medicine with mg/specifier, or type your city name..." autocomplete="off" />
-            <button type="submit" id="chatSendBtn" class="btn-primary btn-chat-send">Send</button>
+            <input type="text" id="chatInput" class="control-input chat-input-field" data-i18n-placeholder="ai.input_placeholder" placeholder="Ask about a disease, a medicine with mg/specifier, or type your city name..." autocomplete="off" />
+            <button type="submit" id="chatSendBtn" class="btn-primary btn-chat-send" data-i18n="ai.send_btn">Send</button>
           </div>
         </form>
       </div>
@@ -146,21 +230,21 @@
     <section id="healthGuideSection" class="guide-module glass-panel" aria-labelledby="guideHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">OFFLINE ESSENTIALS • EVIDENCE-BASED &amp; CACHED LOCALLY</span>
-          <h2 id="guideHeading">Offline Essential Health &amp; First-Aid Guide</h2>
-          <p id="guideSubheading" class="text-muted">
+          <span class="eyebrow" id="guideEyebrow" data-i18n="guide.eyebrow">OFFLINE ESSENTIALS • EVIDENCE-BASED &amp; CACHED LOCALLY</span>
+          <h2 id="guideHeading" data-i18n="guide.heading">Offline Essential Health &amp; First-Aid Guide</h2>
+          <p id="guideSubheading" class="text-muted" data-i18n="guide.subheading">
             Evidence-based home first-aid protocols available 100% offline without mobile data or internet connection.
           </p>
         </div>
-        <span class="offline-pill" id="guideOfflineBadge">Cached Offline in Browser</span>
+        <span class="offline-pill" id="guideOfflineBadge" data-i18n="guide.badge">Cached Offline in Browser</span>
       </div>
 
       <div class="guide-filter-bar">
-        <button type="button" class="guide-tab-btn active" data-category="all">All Essential Guides</button>
-        <button type="button" class="guide-tab-btn" data-category="hydration_gastro">ORS &amp; Hydration</button>
-        <button type="button" class="guide-tab-btn" data-category="environmental">Summer &amp; Heat Care</button>
-        <button type="button" class="guide-tab-btn" data-category="trauma">Burns &amp; Injuries</button>
-        <button type="button" class="guide-tab-btn" data-category="toxicology">Snakebite Precautions</button>
+        <button type="button" class="guide-tab-btn active" data-category="all" data-i18n="guide.tab_all">All Essential Guides</button>
+        <button type="button" class="guide-tab-btn" data-category="hydration_gastro" data-i18n="guide.tab_ors">ORS &amp; Hydration</button>
+        <button type="button" class="guide-tab-btn" data-category="environmental" data-i18n="guide.tab_heat">Summer &amp; Heat Care</button>
+        <button type="button" class="guide-tab-btn" data-category="trauma" data-i18n="guide.tab_burns">Burns &amp; Injuries</button>
+        <button type="button" class="guide-tab-btn" data-category="toxicology" data-i18n="guide.tab_snake">Snakebite Precautions</button>
       </div>
 
       <div id="healthGuideGrid" class="guide-grid" aria-live="polite"></div>
@@ -170,77 +254,62 @@
     <section id="doctorConsultationSection" class="consultation-module glass-panel" aria-labelledby="consultHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">PROFESSIONAL CARE • REGISTERED MEDICAL PRACTITIONERS</span>
-          <h2 id="consultHeading">Request a Doctor Consultation</h2>
-          <p id="consultSubheading" class="text-muted">
+          <span class="eyebrow" id="consultEyebrow" data-i18n="consult.eyebrow">PROFESSIONAL CARE • REGISTERED MEDICAL PRACTITIONERS</span>
+          <h2 id="consultHeading" data-i18n="consult.heading">Request a Doctor Consultation</h2>
+          <p id="consultSubheading" class="text-muted" data-i18n="consult.subheading">
             Submit a non-emergency consultation request. A verified medical coordinator or doctor speaking your preferred regional language will contact you.
           </p>
         </div>
-        <span class="pathway-pill" id="doctorPathwayBadge">Human Medical Review</span>
+        <span class="pathway-pill" id="doctorPathwayBadge" data-i18n="consult.badge">Human Medical Review</span>
       </div>
 
       <div class="consultation-grid">
         <form id="consultationForm" class="consult-form">
           <div class="form-group">
-            <label for="consultName">Patient Name / Identifier</label>
-            <input type="text" id="consultName" class="control-input full-width" required placeholder="Enter patient name" />
+            <label for="consultName" data-i18n="consult.label_name">Patient Name / Identifier</label>
+            <input type="text" id="consultName" class="control-input full-width" required data-i18n-placeholder="consult.placeholder_name" placeholder="Enter patient name" />
           </div>
 
           <div class="form-group">
-            <label for="consultPhone">10-Digit Mobile Number (for Doctor Callback)</label>
-            <input type="tel" id="consultPhone" class="control-input full-width" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" />
+            <label for="consultPhone" data-i18n="consult.label_phone">10-Digit Mobile Number (for Doctor Callback)</label>
+            <input type="tel" id="consultPhone" class="control-input full-width" required data-i18n-placeholder="consult.placeholder_phone" placeholder="e.g. 9876543210" />
           </div>
 
           <div class="form-row">
             <div class="form-group flex-1">
-              <label for="consultDistrict">City / District (All India)</label>
-              <select id="consultDistrict" class="control-select full-width">
-                <option value="Bhavnagar">Bhavnagar</option>
-                <option value="Ahmedabad">Ahmedabad</option>
-                <option value="Mumbai">Mumbai</option>
-                <option value="New Delhi">New Delhi</option>
-                <option value="Bengaluru">Bengaluru</option>
-                <option value="Chennai">Chennai</option>
-                <option value="Hyderabad">Hyderabad</option>
-                <option value="Kolkata">Kolkata</option>
-              </select>
+              <label for="consultDistrict" data-i18n="consult.label_city">City / District (All India)</label>
+              <select id="consultDistrict" class="control-select full-width"></select>
             </div>
 
             <div class="form-group flex-1">
-              <label for="consultLang">Preferred Consultation Language (22 Languages)</label>
-              <select id="consultLang" class="control-select full-width">
-                <option value="en">English (English)</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="gu">ગુજરાતી (Gujarati)</option>
-              </select>
+              <label for="consultLang" data-i18n="consult.label_lang">Preferred Consultation Language (22 Languages)</label>
+              <select id="consultLang" class="control-select full-width"></select>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="consultSymptoms">Symptoms / Health Concern for Doctor</label>
-            <textarea id="consultSymptoms" class="control-input full-width textarea-tall" required placeholder="Describe symptoms, duration, and comfort level..."></textarea>
+            <label for="consultSymptoms" data-i18n="consult.label_symptoms">Symptoms / Health Concern for Doctor</label>
+            <textarea id="consultSymptoms" class="control-input full-width textarea-tall" required data-i18n-placeholder="consult.placeholder_symptoms" placeholder="Describe symptoms, duration, and comfort level..."></textarea>
           </div>
 
           <div class="form-group checkbox-group">
             <input type="checkbox" id="consultConsent" required checked />
-            <label for="consultConsent">
+            <label for="consultConsent" data-i18n="consult.consent">
               I understand this service is for non-emergency medical consultation and agree to be contacted.
             </label>
           </div>
 
-          <button type="submit" id="consultSubmitBtn" class="btn-primary full-width">
+          <button type="submit" id="consultSubmitBtn" class="btn-primary full-width" data-i18n="consult.submit_btn">
             Submit Doctor Consultation Request
           </button>
         </form>
 
         <div class="consult-queue-panel">
-          <h3 id="queueTitle">Active Consultation Requests</h3>
-          <p class="text-muted small-note" id="queueSubtitle">
+          <h3 id="queueTitle" data-i18n="consult.queue_title">Active Consultation Requests</h3>
+          <p class="text-muted small-note" id="queueSubtitle" data-i18n="consult.queue_subtitle">
             Track your queued consultations. Requests are evaluated with triage safety priority.
           </p>
-          <div id="consultationList" class="consult-card-list" aria-live="polite">
-            <p class="text-muted">No active requests submitted yet.</p>
-          </div>
+          <div id="consultationList" class="consult-card-list" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -249,65 +318,65 @@
     <section id="medicationRemindersSection" class="reminders-module glass-panel" aria-labelledby="medHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">SAFE ADHERENCE • PROHIBITS AUTONOMOUS TREATMENT CHANGES</span>
-          <h2 id="medHeading">Prescribed Medication Adherence Reminders</h2>
-          <p id="medSubheading" class="text-muted">
+          <span class="eyebrow" id="medEyebrow" data-i18n="med.eyebrow">SAFE ADHERENCE • PROHIBITS AUTONOMOUS TREATMENT CHANGES</span>
+          <h2 id="medHeading" data-i18n="med.heading">Prescribed Medication Adherence Reminders</h2>
+          <p id="medSubheading" class="text-muted" data-i18n="med.subheading">
             Track schedules written on your doctor's prescription. Nova Healthtech never prescribes or alters doses.
           </p>
         </div>
-        <span class="safety-adherence-pill">Prescription-Strict Tracker</span>
+        <span class="safety-adherence-pill" id="medSafetyPill" data-i18n="med.badge">Prescription-Strict Tracker</span>
       </div>
 
       <div class="reminders-layout-grid">
         <form id="medicationReminderForm" class="reminder-form">
           <div class="form-group">
-            <label for="medName">Medicine Name (as on doctor's prescription)</label>
-            <input type="text" id="medName" class="control-input full-width" required placeholder="e.g. Paracetamol 500mg" />
+            <label for="medName" data-i18n="med.label_name">Medicine Name (as on doctor's prescription)</label>
+            <input type="text" id="medName" class="control-input full-width" required data-i18n-placeholder="med.placeholder_name" placeholder="e.g. Paracetamol 500mg" />
           </div>
 
           <div class="form-row">
             <div class="form-group flex-1">
-              <label for="medDosage">Prescribed Dose Notes</label>
-              <input type="text" id="medDosage" class="control-input full-width" required placeholder="e.g. 1 Tablet" />
+              <label for="medDosage" data-i18n="med.label_dose">Prescribed Dose Notes</label>
+              <input type="text" id="medDosage" class="control-input full-width" required data-i18n-placeholder="med.placeholder_dose" placeholder="e.g. 1 Tablet" />
             </div>
 
             <div class="form-group flex-1">
-              <label for="medTime">Daily Reminder Time</label>
+              <label for="medTime" data-i18n="med.label_time">Daily Reminder Time</label>
               <input type="time" id="medTime" class="control-input full-width" required value="08:00" />
             </div>
           </div>
 
           <div class="form-group">
-            <label for="medMeal">Meal Relation (per prescription)</label>
+            <label for="medMeal" data-i18n="med.label_meal">Meal Relation (per prescription)</label>
             <select id="medMeal" class="control-select full-width">
-              <option value="after_food">After Food (જમ્યા પછી / भोजन के बाद)</option>
-              <option value="before_food">Before Food (ભૂખ્યા પેટે / भोजन से पहले)</option>
-              <option value="with_food">With Food (જમતી વખતે / भोजन के साथ)</option>
-              <option value="no_restriction">No Food Restriction</option>
+              <option value="after_food" data-i18n="med.meal_after">After Food</option>
+              <option value="before_food" data-i18n="med.meal_before">Before Food</option>
+              <option value="with_food" data-i18n="med.meal_with">With Food</option>
+              <option value="no_restriction" data-i18n="med.meal_none">No Food Restriction</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="medNotes">Doctor Notes / Days (Optional)</label>
-            <input type="text" id="medNotes" class="control-input full-width" placeholder="e.g. For 5 days as prescribed" />
+            <label for="medNotes" data-i18n="med.label_notes">Doctor Notes / Days (Optional)</label>
+            <input type="text" id="medNotes" class="control-input full-width" data-i18n-placeholder="med.placeholder_notes" placeholder="e.g. For 5 days as prescribed" />
           </div>
 
           <div class="form-group checkbox-group verification-box">
             <input type="checkbox" id="medDoctorConfirm" required />
-            <label for="medDoctorConfirm">
-              <strong>Mandatory Confirmation:</strong> I confirm this medicine and dosage are strictly as prescribed by my licensed doctor.
+            <label for="medDoctorConfirm" data-i18n="med.confirm">
+              Mandatory Confirmation: I confirm this medicine and dosage are strictly as prescribed by my licensed doctor.
             </label>
           </div>
 
-          <button type="submit" id="medSubmitBtn" class="btn-primary full-width">
+          <button type="submit" id="medSubmitBtn" class="btn-primary full-width" data-i18n="med.submit_btn">
             Add Safe Medication Reminder
           </button>
         </form>
 
         <div class="reminders-display-panel">
           <div class="reminders-header-bar">
-            <h3 id="activeMedsTitle">Today's Medication Schedule</h3>
-            <button type="button" id="testVoiceAlertBtn" class="btn-outline-small" title="Test audio reminder announcement">
+            <h3 id="activeMedsTitle" data-i18n="med.schedule_title">Today's Medication Schedule</h3>
+            <button type="button" id="testVoiceAlertBtn" class="btn-outline-small" data-i18n="med.test_voice_btn">
               🔊 Test Voice Reminder
             </button>
           </div>
@@ -320,24 +389,24 @@
     <section id="emergencyTriageSection" class="triage-module glass-panel" aria-labelledby="triageHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">SAFETY GATE • RULE-BASED &amp; WORKS 100% OFFLINE</span>
-          <h2 id="triageHeading">Emergency Symptom Red-Flag Checker</h2>
-          <p id="triageSubheading" class="text-muted">
+          <span class="eyebrow" id="triageEyebrow" data-i18n="triage.eyebrow">SAFETY GATE • RULE-BASED &amp; WORKS 100% OFFLINE</span>
+          <h2 id="triageHeading" data-i18n="triage.heading">Emergency Symptom Red-Flag Checker</h2>
+          <p id="triageSubheading" class="text-muted" data-i18n="triage.subheading">
             Directly test symptoms against our deterministic emergency catalog. If a red flag is found, call 108 immediately.
           </p>
         </div>
-        <span class="safety-gate-pill" id="triageEngineBadge">Deterministic Engine Active</span>
+        <span class="safety-gate-pill" id="triageEngineBadge" data-i18n="triage.badge">Deterministic Engine Active</span>
       </div>
 
       <form id="triageForm" class="triage-form">
         <div id="triageCheckboxesGrid" class="triage-checkbox-grid" role="group" aria-label="Emergency Red-Flag Symptoms"></div>
         <div class="form-group">
-          <label for="triageFreeText">Or describe symptoms in your language:</label>
-          <input type="text" id="triageFreeText" class="control-input full-width" placeholder="e.g., chest pain / છાતીમાં દુખાવો / सीने में दर्द" autocomplete="off" />
+          <label for="triageFreeText" data-i18n="triage.label_input">Or describe symptoms in your language:</label>
+          <input type="text" id="triageFreeText" class="control-input full-width" data-i18n-placeholder="triage.placeholder_input" placeholder="e.g., chest pain, severe bleeding, difficulty breathing" autocomplete="off" />
         </div>
         <div class="triage-actions-row">
-          <button type="submit" id="triageSubmitBtn" class="btn-danger-check">Check for Emergency Red Flags Now</button>
-          <button type="button" id="triageResetBtn" class="control-btn">Clear Selection</button>
+          <button type="submit" id="triageSubmitBtn" class="btn-danger-check" data-i18n="triage.submit_btn">Check for Emergency Red Flags Now</button>
+          <button type="button" id="triageResetBtn" class="control-btn" data-i18n="triage.reset_btn">Clear Selection</button>
         </div>
       </form>
 
@@ -348,58 +417,97 @@
     <section id="healthBenefitsModule" class="benefits-module glass-panel" aria-labelledby="benefitsHeading">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow">ALL-INDIA PUBLIC HEALTH • VERIFIED OFFICIAL GUIDANCE</span>
-          <h2 id="benefitsHeading">Health Cards, All-India Hospitals &amp; Government Benefits</h2>
-          <p id="benefitsSubheading" class="text-muted">
-            Navigate Ayushman Bharat PM-JAY, PMJAY-MA, Senior Citizen 70+ Vay Vandana, ABHA accounts, and participating hospitals across India.
+          <span class="eyebrow" id="benefitsEyebrow" data-i18n="benefits.eyebrow">ALL-INDIA PUBLIC HEALTH • VERIFIED OFFICIAL GUIDANCE</span>
+          <h2 id="benefitsHeading" data-i18n="benefits.heading">Health Cards, All-India Hospitals &amp; Government Benefits</h2>
+          <p id="benefitsSubheading" class="text-muted" data-i18n="benefits.subheading">
+            Navigate Ayushman Bharat PM-JAY, PMJAY-MA, Senior Citizen 70+ Vay Vandana, ABHA accounts, and participating hospitals across all 36 States &amp; Union Territories of India.
           </p>
         </div>
-        <span class="privacy-pill" id="zeroPiiBadge">Zero-ID Privacy Shield Active</span>
+        <span class="privacy-pill" id="zeroPiiBadge" data-i18n="benefits.badge">Zero-ID Privacy Shield Active</span>
       </div>
 
       <div id="schemesGrid" class="schemes-grid" aria-live="polite"></div>
 
       <div class="benefits-tools-grid">
         <div class="tool-box">
-          <h3 id="screenerTitle">Preliminary Scheme Orientation Check (No ID Required)</h3>
+          <h3 id="screenerTitle" data-i18n="screener.title">Preliminary Scheme Orientation Check (No ID Required)</h3>
           <form id="benefitsScreenerForm" class="screener-form">
             <div class="form-group">
-              <label for="screenAge">1. Patient Age Group</label>
+              <label for="screenAge" data-i18n="screener.label_age">1. Patient Age Group</label>
               <select id="screenAge" class="control-select full-width">
-                <option value="under_60">Under 60 years</option>
-                <option value="60_to_69">60 to 69 years</option>
-                <option value="70_plus">70 years or older (Vay Vandana)</option>
+                <option value="under_60" data-i18n="screener.age_under_60">Under 60 years</option>
+                <option value="60_to_69" data-i18n="screener.age_60_69">60 to 69 years</option>
+                <option value="70_plus" data-i18n="screener.age_70_plus">70 years or older (Vay Vandana)</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="screenState">2. State of Residence</label>
+              <label for="screenState" data-i18n="screener.label_state">2. State of Residence</label>
               <select id="screenState" class="control-select full-width">
-                <option value="gujarat">Gujarat (PMJAY-MA)</option>
-                <option value="other_india">Other Indian State (PM-JAY)</option>
+                <option value="gujarat" data-i18n="screener.state_gujarat">Gujarat (PMJAY-MA)</option>
+                <option value="other_india" data-i18n="screener.state_other">Other Indian State (PM-JAY)</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="screenIncome">3. Approximate Family Income</label>
+              <label for="screenIncome" data-i18n="screener.label_income">3. Approximate Family Income</label>
               <select id="screenIncome" class="control-select full-width">
-                <option value="bpl_secc">BPL Card / PM-JAY SECC</option>
-                <option value="under_4_lakh">Up to ₹4 Lakh / year</option>
-                <option value="above_6_lakh">Above ₹6 Lakh / year</option>
+                <option value="bpl_secc" data-i18n="screener.inc_bpl">BPL Card / PM-JAY SECC</option>
+                <option value="under_4_lakh" data-i18n="screener.inc_4l">Up to ₹4 Lakh / year</option>
+                <option value="above_6_lakh" data-i18n="screener.inc_6l">Above ₹6 Lakh / year</option>
               </select>
             </div>
-            <button type="submit" id="screenerSubmitBtn" class="btn-primary full-width">View Guidance</button>
+            <button type="submit" id="screenerSubmitBtn" class="btn-primary full-width" data-i18n="screener.submit_btn">View Guidance</button>
           </form>
           <div id="screenerResultBox" class="screener-results" hidden aria-live="polite"></div>
         </div>
 
         <div class="tool-box">
-          <h3 id="hospitalFinderTitle">🏥 Find Participating Hospitals Across India (By State &amp; City)</h3>
-          <div class="form-group">
-            <select id="districtFilter" class="control-select full-width">
-              <option value="all">All Listed Districts</option>
-            </select>
+          <h3 id="hospitalFinderTitle" data-i18n="hospitals.title">🏥 Find Participating Hospitals Across India (All 36 States &amp; UTs)</h3>
+          <div class="form-group" style="margin-bottom:0.6rem;">
+            <input type="text" id="hospitalSearchInput" class="control-input full-width" data-i18n-placeholder="hospitals.search_placeholder" placeholder="Search hospital name, city, PIN code, or specialty..." />
+          </div>
+          <div class="directory-filter-row">
+            <div class="directory-filter-col">
+              <label for="hospStateFilter" class="directory-filter-label" data-i18n="hospitals.filter_state">1. Select State / UT (All India)</label>
+              <select id="hospStateFilter" class="control-select full-width"></select>
+            </div>
+            <div class="directory-filter-col">
+              <label for="hospCityFilter" class="directory-filter-label" data-i18n="hospitals.filter_city">2. Select City / District</label>
+              <select id="hospCityFilter" class="control-select full-width"></select>
+            </div>
           </div>
           <div id="hospitalListContainer" class="hospital-list" aria-live="polite"></div>
         </div>
+      </div>
+    </section>
+
+    <!-- SECTION: NEARBY MEDICINE STORES & PHARMACIES -->
+    <section id="medicineStoresSection" class="benefits-module glass-panel" aria-labelledby="medStoreHeading">
+      <div class="section-header-row">
+        <div>
+          <span class="eyebrow" data-i18n="stores.eyebrow">ALL-INDIA PHARMACY LOCATOR • 50%–90% SUBSIDIZED GENERIC MEDICINES</span>
+          <h2 id="medStoreHeading" data-i18n="stores.heading">💊 Nearby Medicine Stores &amp; Jan Aushadhi Kendras (All 36 States &amp; UTs)</h2>
+          <p id="medStoreSubheading" class="text-muted" data-i18n="stores.subheading">
+            Locate 24x7 Government Hospital Pharmacies, AMRIT Pharmacies, and Pradhan Mantri Bhartiya Janaushadhi Kendras (PMBJK) across India with clickable phone numbers and Google Maps directions.
+          </p>
+        </div>
+        <span class="privacy-pill" data-i18n="stores.badge">Toll-Free: 1800-180-8080</span>
+      </div>
+
+      <div class="tool-box">
+        <div class="form-group" style="margin-bottom:0.6rem;">
+          <input type="text" id="storeSearchInput" class="control-input full-width" placeholder="Search pharmacy name, city, state, or PIN code..." />
+        </div>
+        <div class="directory-filter-row">
+          <div class="directory-filter-col">
+            <label for="storeStateFilter" class="directory-filter-label" data-i18n="hospitals.filter_state">1. Select State / UT (All India)</label>
+            <select id="storeStateFilter" class="control-select full-width"></select>
+          </div>
+          <div class="directory-filter-col">
+            <label for="storeCityFilter" class="directory-filter-label" data-i18n="hospitals.filter_city">2. Select City / District</label>
+            <select id="storeCityFilter" class="control-select full-width"></select>
+          </div>
+        </div>
+        <div id="medicineStoresGrid" class="schemes-grid" aria-live="polite"></div>
       </div>
     </section>
 
@@ -407,15 +515,15 @@
     <section class="diagnostic-panel glass-panel" aria-labelledby="diagHeading">
       <div class="diagnostic-panel__header">
         <div>
-          <span class="eyebrow">TELEMETRY &amp; EDGE RESILIENCE</span>
-          <h2 id="diagHeading">System Verification &amp; Rural Network Stress Tester</h2>
-          <p class="text-muted">Simulate low-bandwidth 2G latency, verify rate-limiting defenses, and audit 22-language readiness.</p>
+          <span class="eyebrow" id="diagEyebrow" data-i18n="diag.eyebrow">TELEMETRY &amp; EDGE RESILIENCE</span>
+          <h2 id="diagHeading" data-i18n="diag.heading">System Verification &amp; Rural Network Stress Tester</h2>
+          <p class="text-muted" id="diagSubheading" data-i18n="diag.subheading">Simulate low-bandwidth 2G latency, verify rate-limiting defenses, and audit 22-language readiness.</p>
         </div>
         <div class="stress-btn-group">
-          <button id="runStressTestBtn" type="button" class="btn-outline-small">
+          <button id="runStressTestBtn" type="button" class="btn-outline-small" data-i18n="diag.stress_btn">
             ⚡ Run Rural 2G Stress Test
           </button>
-          <button id="verifyBtn" type="button" class="btn-primary">
+          <button id="verifyBtn" type="button" class="btn-primary" data-i18n="diag.verify_btn">
             Test Backend Connection
           </button>
         </div>
@@ -424,27 +532,27 @@
       <div id="diagnosticOutput" class="diagnostic-output" aria-live="polite">
         <div class="diag-grid">
           <div class="diag-item">
-            <span class="diag-label">AI Engine Status</span>
-            <strong id="diagStatus">🟢 AI is Online</strong>
+            <span class="diag-label" data-i18n="diag.label_ai">AI Engine Status</span>
+            <strong id="diagStatus" data-i18n="header.ai_online">🟢 AI is Online</strong>
           </div>
           <div class="diag-item">
-            <span class="diag-label">Rate Limiter &amp; CSP</span>
-            <strong id="diagSecurityState">Sliding Window Active</strong>
+            <span class="diag-label" data-i18n="diag.label_security">Rate Limiter &amp; CSP</span>
+            <strong id="diagSecurityState" data-i18n="diag.val_security">Sliding Window Active</strong>
           </div>
           <div class="diag-item">
-            <span class="diag-label">Language Pack</span>
-            <strong id="diagGuideState">22 Regional Languages</strong>
+            <span class="diag-label" data-i18n="diag.label_lang">Language Pack</span>
+            <strong id="diagGuideState" data-i18n="diag.val_lang">22 Regional Languages</strong>
           </div>
           <div class="diag-item">
-            <span class="diag-label">Service Worker</span>
-            <strong id="diagSwState">Active</strong>
+            <span class="diag-label" data-i18n="diag.label_sw">Service Worker</span>
+            <strong id="diagSwState" data-i18n="diag.val_sw">Active</strong>
           </div>
         </div>
-        <p id="diagMessage" class="diag-message text-muted">Click "Test Backend Connection" or "Run Rural 2G Stress Test" to evaluate resilience.</p>
+        <p id="diagMessage" class="diag-message text-muted" data-i18n="diag.note">Click "Test Backend Connection" or "Run Rural 2G Stress Test" to evaluate resilience.</p>
       </div>
 
       <div id="stressTestTerminal" class="stress-terminal" hidden aria-live="polite">
-        <h4>Rural Network Simulation Results (Latency &amp; Payloads)</h4>
+        <h4 data-i18n="diag.term_title">Rural Network Simulation Results (Latency &amp; Payloads)</h4>
         <pre id="stressTerminalOutput">Awaiting stress test trigger...</pre>
       </div>
     </section>
@@ -452,11 +560,12 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <p>&copy; 2026 Nova Healthtech (All-India 22-Language Healthcare Platform). Preliminary clinical awareness tool.</p>
-      <p class="text-muted">Emergency in India: Dial 108 (Ambulance) / 112 (National Emergency) / 1800-180-8080 (Jan Aushadhi)</p>
+      <p id="footerCopyText" data-i18n="footer.copy">&copy; 2026 Nova Healthtech (All-India 22-Language Healthcare Platform). Preliminary clinical awareness tool.</p>
+      <p class="text-muted" id="footerEmergencyText" data-i18n="footer.emergency">Emergency in India: Dial 108 (Ambulance) / 112 (National Emergency) / 1800-180-8080 (Jan Aushadhi)</p>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Master Application Controller -->
+  <script src="script.js?v=2026master"></script>
 </body>
 </html>

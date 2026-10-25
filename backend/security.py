@@ -52,7 +52,7 @@ def apply_security_headers(response: Response) -> Response:
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=(self)"
+    response.headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=(self)"
     # Allow connect-src across local network / mobile hotspot IPs
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
