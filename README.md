@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Nova Healthtech (Demonstration Prototype)
 
 Nova Healthtech is an AI-assisted preliminary health guidance, emergency orientation, and doctor-access platform designed with rural and low-bandwidth Indian users in mind (supporting English, Gujarati, and Hindi).
@@ -21,3 +22,7 @@ NovaHealthtech/
 │   └── requirements.txt # Locked Python dependencies
 ├── .gitignore           # Excludes venv, .env, caches, and databases
 └── README.md            # Project documentation
+=======
+# NovaHealthtech
+details of NovaHealthtech and its code
+>>>>>>> 93d0e43b0215811cf7d3e39bc0974397fff8894f

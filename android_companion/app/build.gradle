@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.application' version '8.3.0'
+    id 'org.jetbrains.kotlin.android' version '1.9.22'
+}
+
+android {
+    namespace 'in.novahealthtech.companion'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "in.novahealthtech.companion"
+        minSdk 26
+        targetSdk 34
+        versionCode 3
+        versionName "1.2"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+// Automatically generates res/xml/accessibility_service_config.xml before building so AAPT never fails
+tasks.matching { it.name.startsWith("pre") && it.name.endsWith("Build") }.configureEach {
+    doFirst {
+        File xmlDir = file("src/main/res/xml")
+        if (!xmlDir.exists()) xmlDir.mkdirs()
+        File cfg = new File(xmlDir, "accessibility_service_config.xml")
+        cfg.write("""<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault|flagReportViewIds|flagRetrieveInteractiveWindows|flagIncludeNotImportantViews"
+    android:canPerformGestures="true"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="50" />
+""", "UTF-8")
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+}

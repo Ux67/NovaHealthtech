@@ -1,25 +1,9 @@
-# Environment variables and API keys (CRITICAL FOR SECURITY)
+@"
 .env
-.env.local
-.env.*.local
-
-# Python virtual environments
-venv/
-.venv/
-env/
-ENV/
-
-# Python bytecode and cache
+.env.txt
+backend/api_key_config.py
 __pycache__/
-*.py[cod]
-*$py.class
-
-# SQLite database files (for future milestones)
-*.db
-*.sqlite
-*.sqlite3
-
-# VS Code and OS metadata
-.vscode/
-.DS_Store
-Thumbs.db
+*.pyc
+.venv/
+translation_cache*.json
+"@ | Out-File -FilePath .gitignore -Encoding utf8
