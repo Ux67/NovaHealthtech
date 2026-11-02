@@ -592,26 +592,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun promptToEnableAccessibilityAutoClicker() {
-        try {
-            AlertDialog.Builder(this)
-                .setTitle("Enable Emergency Auto-Caller")
-                .setMessage(
-                    "To make your phone automatically tap the green Call button when dialing your saved emergency contact during SOS:\n\n" +
-                    "1. Tap 'Turn On Now' below.\n" +
-                    "2. Tap 'Installed apps' (or 'Downloaded apps').\n" +
-                    "3. Select 'Emergency Auto-Caller' and toggle it ON."
-                )
-                .setCancelable(true)
-                .setPositiveButton("Turn On Now") { _, _ ->
-                    try {
-                        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                    } catch (_: Exception) {}
-                }
-                .setNegativeButton("Later", null)
-                .show()
-        } catch (_: Exception) {}
-    }
 
     private fun loadIndexHtmlWithPreInjectedEngine() {
         try {
@@ -626,11 +606,11 @@ class MainActivity : AppCompatActivity() {
             )
             rawHtml = rawHtml.replace(
                 Regex("Auto-Calling\\s*108", RegexOption.IGNORE_CASE),
-                "Auto-Calling Saved Contact"
+                "Emergency Dialer Ready"
             )
             rawHtml = rawHtml.replace(
                 Regex("CALLING\\s*AMBULANCE\\s*\\(108\\)", RegexOption.IGNORE_CASE),
-                "CALLING SAVED EMERGENCY CONTACT"
+                "OPENING EMERGENCY DIALER"
             )
             rawHtml = rawHtml.replace(
                 Regex("Call\\s*108\\s*Immediately", RegexOption.IGNORE_CASE),
@@ -1282,7 +1262,7 @@ class MainActivity : AppCompatActivity() {
                     } else if (saved) {
                         window.location.href = 'tel:' + saved;
                     } else {
-                        alert('No emergency number saved yet! Please enter and save a phone number in the Emergency Auto-Call Number box.');
+                        if (window.showNotice) window.showNotice('No emergency number saved yet. Add a trusted contact in Emergency Settings.', 'warning'); else console.warn('No emergency contact saved.');
                     }
                 };
 
@@ -1314,7 +1294,7 @@ class MainActivity : AppCompatActivity() {
                             return;
                         }
                     } catch (e) {}
-                    alert("Opens Android System Accessibility Settings > Emergency Auto-Caller.");
+                    if (window.showNotice) window.showNotice("Emergency calls are user-confirmed. Accessibility screen-tapping is not used.", "info");
                 };
 
                 function getChatSessions() {
