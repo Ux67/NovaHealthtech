@@ -150,8 +150,13 @@ class AccidentDetectionService : Service(), SensorEventListener {
             if (countdownRemainingSec <= 0) {
                 currentState = DetectorState.MONITORING
                 lastTriggerCompletedAtMs = System.currentTimeMillis()
-                cancelAlertNotification()
-                executeBackgroundEmergencyCall(targetNumber, candidateImpactPeakMs2)
+                releaseWakeLock()
+                showHighPriorityCountdownNotification(
+                    0,
+                    candidateImpactPeakMs2,
+                    targetNumber,
+                    getSavedEmergencyName()
+                )
                 return
             }
             showHighPriorityCountdownNotification(
@@ -436,64 +441,28 @@ class AccidentDetectionService : Service(), SensorEventListener {
             return
         }
 
-        val hasCallPerm = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CALL_PHONE
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (!hasCallPerm) {
-            try {
-                val fallbackUi = Intent(this, MainActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    putExtra("CRASH_DETECTED", true)
-                    putExtra("PEAK_ACCEL", peakAccelMs2)
-                }
-                startActivity(fallbackUi)
-            } catch (_: Exception) {}
-            return
+        // Invoked only after the user taps the notification action.
+        // ACTION_DIAL opens the system dialer; the user reviews and places the call.
+        val dialIntent = Intent(
+            Intent.ACTION_DIAL,
+            Uri.fromParts("tel", cleanNumber, null)
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-
-        val now = System.currentTimeMillis()
-        val uri = Uri.fromParts("tel", cleanNumber, null)
-
-        NovaAutoCallCoordinator.targetNumber = cleanNumber
-        NovaAutoCallCoordinator.autoCallRequestedAtMs = now
-        NovaAutoCallCoordinator.scheduleImmediateDialerTap()
-
-        val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-        var primaryPhoneAccount = try {
-            telecomManager.getDefaultOutgoingPhoneAccount("tel")
+        try {
+            startActivity(dialIntent)
         } catch (_: Exception) {
-            null
-        }
-        if (primaryPhoneAccount == null) {
+            val fallbackUi = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                putExtra("CRASH_DETECTED", true)
+                putExtra("PEAK_ACCEL", peakAccelMs2)
+            }
             try {
-                val accounts = telecomManager.callCapablePhoneAccounts
-                if (accounts.isNotEmpty()) primaryPhoneAccount = accounts[0]
-            } catch (_: Exception) {}
+                startActivity(fallbackUi)
+            } catch (_: Exception) {
+                Toast.makeText(applicationContext, "Unable to open the phone dialer. Use your phone's emergency calling feature.", Toast.LENGTH_LONG).show()
+            }
         }
-
-        try {
-            val extras = Bundle().apply {
-                putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
-                if (primaryPhoneAccount != null) {
-                    putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, primaryPhoneAccount)
-                }
-            }
-            telecomManager.placeCall(uri, extras)
-            return
-        } catch (_: Exception) {}
-
-        try {
-            val callIntent = Intent(Intent.ACTION_CALL, uri).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                putExtra(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
-                if (primaryPhoneAccount != null) {
-                    putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, primaryPhoneAccount)
-                }
-            }
-            startActivity(callIntent)
-        } catch (_: Exception) {}
     }
 
     private fun acquireTemporaryWakeLock() {
@@ -565,7 +534,7 @@ class AccidentDetectionService : Service(), SensorEventListener {
                 "Nova Critical SOS Countdown Alerts",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Full-screen emergency countdown before auto-calling your saved emergency contact."
+                description = "Emergency countdown with a user-controlled dialer action."
                 enableVibration(true)
                 setSound(alarmSound, audioAttrs)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -590,14 +559,14 @@ class AccidentDetectionService : Service(), SensorEventListener {
         val savedNum = getSavedEmergencyNumber()
         val bgEnabled = isBackgroundAutoCallingAllowed()
         val statusText = when {
-            !bgEnabled -> "Background Auto-Calling is OFF when app is closed"
-            savedNum.isNotEmpty() -> "Hard-Impact Guard Active • Auto-Calls $savedNum"
+            !bgEnabled -> "Background impact monitoring is OFF when app is closed"
+            savedNum.isNotEmpty() -> "Impact monitor active • Saved contact: $savedNum"
             else -> "Hard-Impact Guard Active • Tap to save SOS Number"
         }
 
         return NotificationCompat.Builder(this, MONITOR_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_call)
-            .setContentTitle("Nova Emergency Auto-Caller")
+            .setContentTitle("Nova Emergency Monitor")
             .setContentText(statusText)
             .setContentIntent(contentPi)
             .setOngoing(true)
@@ -649,16 +618,16 @@ class AccidentDetectionService : Service(), SensorEventListener {
         val peakFormatted = String.format("%.1f", peakMs2)
         val hasTarget = targetNum.isNotEmpty()
         val titleText = if (hasTarget) {
-            "SEVERE IMPACT ($peakFormatted m/s²) — AUTO-CALLING $targetNum"
+            "POTENTIAL EMERGENCY ($peakFormatted m/s²) — REVIEW CALL"
         } else {
             "SEVERE IMPACT ($peakFormatted m/s²) — NO SOS CONTACT SAVED"
         }
         val bodyText = if (hasTarget) {
-            "Dialing $targetName ($targetNum) in ${secondsLeft}s. Tap CANCEL if safe."
+            (if (secondsLeft > 0) "Possible severe impact. Review the alert. $secondsLeft seconds remaining; tap CANCEL if safe." else "Emergency alert active. Tap OPEN DIALER to review the saved contact and place a call.")
         } else {
             "No emergency contact configured (${secondsLeft}s). Tap to configure contact."
         }
-        val callBtnLabel = if (hasTarget) "CALL $targetNum NOW" else "CONFIGURE CONTACT"
+        val callBtnLabel = if (hasTarget) "OPEN DIALER" else "CONFIGURE CONTACT"
 
         val alertNotif = NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_warning)
