@@ -10,6 +10,7 @@ import os
 import re
 import sqlite3
 import time
+from urllib.parse import urlparse
 from datetime import datetime, timezone
 import requests
 from flask import Flask, jsonify, make_response, request, send_from_directory
@@ -74,14 +75,17 @@ health_adapter = DigitalHealthIntegrationAdapter()
 SUPPORTED_LANGUAGE_CODES = list(LANGUAGE_NAMES.keys())
 
 
-def _is_safe_verified_url(url_str: str) -> bool:
+def _is_allowed_directory_url(url_str: str) -> bool:
     if not url_str or not isinstance(url_str, str):
         return False
-    clean = url_str.strip().lower()
-    if not (clean.startswith("https://") or clean.startswith("http://")):
+    clean = url_str.strip()
+    parsed = urlparse(clean)
+    if parsed.scheme.lower() != "https" or not parsed.netloc:
         return False
-    blocked_terms = ("casino", "bet", "gambl", "poker", "slot", "1xbet", "rummy", "javascript:")
-    return not any(b in clean for b in blocked_terms)
+    if parsed.username or parsed.password:
+        return False
+    blocked_terms = ("casino", "bet", "gambl", "poker", "slot", "1xbet", "rummy")
+    return not any(term in parsed.netloc.lower() for term in blocked_terms)
 
 
 def _enrich_directory_records_with_maps(records: list) -> list:
@@ -92,14 +96,15 @@ def _enrich_directory_records_with_maps(records: list) -> list:
         lat = rec.get("latitude")
         lng = rec.get("longitude")
         raw_web = str(rec.get("website", "")).strip()
-        rec["website"] = raw_web if _is_safe_verified_url(raw_web) else ""
-        rec["website_status"] = "verified_official_domain" if rec["website"] else "Official website not verified"
+        rec["website"] = raw_web if _is_allowed_directory_url(raw_web) else ""
+        rec["website_status"] = "link_present_not_independently_verified" if rec["website"] else "official_website_not_verified"
         addr_query = f"{rec.get('name', '')}, {rec.get('address', '')}, {rec.get('city', '')}, {rec.get('state', '')} {rec.get('pin_code', '')}".strip()
         rec["maps_url"] = rec.get("maps_url") or build_google_maps_url(lat, lng, addr_query)
         rec["location_verification"] = (
-            "coordinate_verified" if (lat is not None and lng is not None) else "address_search_verified"
+            "coordinates_available" if (lat is not None and lng is not None) else "map_search_link_only"
         )
-        rec["last_verified"] = rec.get("last_verified", "2026-10")
+        # Never invent a verification date when the source record has no audit timestamp.
+        rec["last_verified"] = rec.get("last_verified") or None
         enriched.append(rec)
     return enriched
 
@@ -168,14 +173,15 @@ def health_check():
         {
             "status": "ok",
             "service": "Nova Healthtech API",
-            "environment": os.getenv("FLASK_ENV", "production-ready"),
+            "environment": os.getenv("FLASK_ENV", "development"),
             "backend_reachable": True,
             "clinically_validated": False,
             "database_status": "sqlite_operational",
-            "ai_online": True,
+            "ai_online": bool(gemini_key_present),
+            "ai_fallback_available": True,
             "ai_provider_configured": gemini_key_present,
             "ai_key_configured": gemini_key_present,
-            "ai_model": "Gemini 2.5 Flash + Clinical Knowledge Engine" if gemini_key_present else "Clinical & OpenFDA/RxNav Knowledge Engine (Set GEMINI_API_KEY in .env for LLM)",
+            "ai_model": "Gemini 2.5 Flash + Clinical Knowledge Engine" if gemini_key_present else "Clinical & OpenFDA/RxNav fallback engine",
             "authorized_dispatch_partner_connected": bool(AUTHORIZED_DISPATCH_API_URL),
             "supported_languages_count": len(SUPPORTED_LANGUAGE_CODES),
             "supported_languages": SUPPORTED_LANGUAGE_CODES,
