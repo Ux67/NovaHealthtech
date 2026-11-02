@@ -1851,6 +1851,8 @@ class MainActivity : AppCompatActivity() {
                             // Never replace a failed live request with a fake success response.
                             return await origFetch(REMOTE_API + apiPath, requestInit);
                         } catch (error) {
+                            // Preserve normal AbortController behavior for cancelled language/chat requests.
+                            if (init && init.signal && init.signal.aborted) throw error;
                             const message = error && error.name === "AbortError"
                                 ? "Nova Healthtech backend timed out. Please retry when the connection is stable."
                                 : "Nova Healthtech backend is unreachable. Check the internet connection and Render service status.";
