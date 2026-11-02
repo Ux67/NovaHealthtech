@@ -601,10 +601,19 @@ class AccidentDetectionService : Service(), SensorEventListener {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val callNowIntent = Intent(this, AccidentDetectionService::class.java).apply {
-            action = ACTION_CALL_SAVED_NOW
+        val hasTarget = targetNum.isNotEmpty()
+        val callNowIntent = if (hasTarget) {
+            Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", targetNum, null)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        } else {
+            Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                putExtra("CRASH_DETECTED", true)
+                putExtra("PEAK_ACCEL", peakMs2)
+            }
         }
-        val callNowPi = PendingIntent.getService(
+        val callNowPi = PendingIntent.getActivity(
             this,
             203,
             callNowIntent,
@@ -612,7 +621,6 @@ class AccidentDetectionService : Service(), SensorEventListener {
         )
 
         val peakFormatted = String.format("%.1f", peakMs2)
-        val hasTarget = targetNum.isNotEmpty()
         val titleText = if (hasTarget) {
             "POTENTIAL EMERGENCY ($peakFormatted m/s²) — SAVED CONTACT ALERT"
         } else {
