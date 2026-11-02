@@ -1303,7 +1303,7 @@ async function sendUserSymptomMessage(displayMessage, queryForBackend) {
   const typingBubble = appendChatMessage(
     "assistant",
     `🌐 Nova AI (${meta.nativeName})...`,
-    "🟢 AI Online • Live Web Search"
+    "Nova AI is preparing a medical answer…"
   );
 
   try {
@@ -1328,7 +1328,7 @@ async function sendUserSymptomMessage(displayMessage, queryForBackend) {
       appendChatMessage(
         "assistant",
         replyWithDigits,
-        "🟢 AI Online • Live Web Search",
+        data.ai_response.safety_disclaimer || (data.ai_response.api_connected ? "Medical information • Educational only" : "Medical answer unavailable"),
         englishBase
       );
     }
@@ -1336,7 +1336,7 @@ async function sendUserSymptomMessage(displayMessage, queryForBackend) {
     if (typingBubble) typingBubble.remove();
     appendChatMessage(
       "assistant",
-      "Please ensure `python backend\\app.py` is running in your terminal.",
+      "Nova AI could not connect to its medical information service. Please try again shortly.",
       "Connection Notice"
     );
   } finally {
