@@ -3,7 +3,7 @@
  * - Zero duplicate variable declarations (0 TypeScript/JS linter errors)
  * - Auto-starts Foreground Crash Sensor Monitoring & Live GPS as soon as the website opens
  * - Starts an 8-second countdown on impact/drop or SOS and automatically shares GPS location
- *   and initiates a direct 108 Ambulance call at 0 seconds unless cancelled
+ *   and requests a call to the saved emergency contact at 0 seconds unless cancelled
  * - Translates 100% of the website from top to bottom across all 22 Indian languages
  * - Displays all 36 Indian States & Union Territories across Hospitals and Medicine Stores
  *   with verified clickable tel: call buttons and Google Maps directions links
@@ -629,7 +629,7 @@ function updateManualLandmarkFallbackStatus(manualText) {
   const encodedMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(manualText)}`;
   statusLine.innerHTML =
     `<strong>📍 Manual Fallback Location Active:</strong> ` +
-    `<span>${manualText.replace(/</g, "&lt;")}</span> (Will be shared automatically with Ambulance 108)`;
+    `<span>${manualText.replace(/</g, "&lt;")}</span> (Will be shared with the saved emergency contact)`;
   actionsDiv.innerHTML = `
     <a href="${encodedMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-official-portal" style="font-size:0.78rem; padding:0.3rem 0.7rem;">
       🗺️ Verify Manual Location on Google Maps ↗
@@ -998,7 +998,7 @@ function startIncidentCountdownWorkflow(triggerSource, sensorPayload) {
   if (details) {
     details.textContent = isSim
       ? "SAFE SIMULATION MODE: In 8 seconds, location will be auto-shared to backend without dialing 108. Click 'CANCEL — I AM SAFE' to abort."
-      : "Acquiring live GPS. In 8 seconds, Nova Healthtech will AUTOMATICALLY place a direct call to 108 (Ambulance) and transmit your location. Click 'CANCEL — I AM SAFE' immediately if this is a false alarm!";
+      : "Acquiring live GPS. In 8 seconds, Nova Healthtech will AUTOMATICALLY place a direct call to the saved emergency contact and transmit your location. Click 'CANCEL — I AM SAFE' immediately if this is a false alarm!";
     if (details.firstChild) details.firstChild._origEn = details.textContent;
   }
 
@@ -1060,12 +1060,18 @@ function triggerAutomaticAmbulanceCall() {
   }
   try {
     if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
+      // The Android bridge resolves the destination again from the native saved-contact store.
       window.NovaAndroidBridge.placeDirectCall(savedNumber);
       return;
     }
-    window.location.href = "tel:" + savedNumber;
+    // Browsers cannot place calls silently. Never open a dialer as an automatic-call fallback.
+    if (typeof showNotice === "function") {
+      showNotice("Automatic SOS calling is available in the installed Android app. A browser cannot place a call without user interaction.", "warning");
+    }
   } catch (e) {
-    window.location.href = "tel:" + savedNumber;
+    if (typeof showNotice === "function") {
+      showNotice("Automatic calling could not start. Check the installed Android app and Phone permission.", "error");
+    }
   }
 }
 
@@ -1122,7 +1128,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
         ? `Manual Landmark: "${loc.manual_location_text}"`
         : "Location pending";
 
-    const emergencyPacketText = `EMERGENCY AMBULANCE (108) DISPATCH LOCATION — Incident: ${inc.incident_uuid} | Coordinates: ${locDescription} | Map: ${loc.maps_url || "N/A"}`;
+    const emergencyPacketText = `EMERGENCY SOS LOCATION — Incident: ${inc.incident_uuid} | Coordinates: ${locDescription} | Map: ${loc.maps_url || "N/A"}`;
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(emergencyPacketText).catch(() => {});
@@ -1140,15 +1146,15 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
           <span class="recommendation-match">${
             inc.is_simulation
               ? "🧪 8s AUTO-SHARE SIMULATION COMPLETED"
-              : "🚨 8s COUNTDOWN COMPLETE — DIRECT 108 CALL & LOCATION SHARED"
+              : "🚨 8s COUNTDOWN COMPLETE — SAVED-CONTACT CALL & LOCATION SHARED"
           }</span>
           <h4>Incident Reference: ${inc.incident_uuid}</h4>
           <p><strong>Direct Ambulance Call Status:</strong> ${
             inc.direct_call_placed
-              ? "🟢 Direct cellular call to <strong>108 (Ambulance)</strong> placed automatically without dialer click!"
+              ? "🟢 Automatic call requested for the saved emergency contact."
               : inc.is_simulation
               ? "Simulation Mode checked — call suppressed for safe testing."
-              : "Automatically triggered <strong>108 (Emergency Ambulance)</strong> call after 8-second countdown."
+              : "Automatic call requested for the saved emergency contact after the 8-second countdown."
           }</p>
           <p><strong>Location Automatically Shared with Ambulance:</strong> <code>${locDescription}</code> (${loc.location_source})</p>
           <p><strong>Dispatch Telemetry Status:</strong> ${inc.dispatch_status_message}</p>
@@ -2136,7 +2142,7 @@ async function initHealthCheck() {
 }
 
 // ============================================================================
-// AUTOMATIC ACCIDENT DETECTION & 8-SECOND AUTO-DIAL 108 MODULE
+// AUTOMATIC ACCIDENT DETECTION & 8-SECOND AUTO-DIAL SAVED EMERGENCY CONTACT MODULE
 // ============================================================================
 
 function triggerAutomaticAmbulanceCall() {
@@ -2149,12 +2155,18 @@ function triggerAutomaticAmbulanceCall() {
   }
   try {
     if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
+      // The Android bridge resolves the destination again from the native saved-contact store.
       window.NovaAndroidBridge.placeDirectCall(savedNumber);
       return;
     }
-    window.location.href = "tel:" + savedNumber;
+    // Browsers cannot place calls silently. Never open a dialer as an automatic-call fallback.
+    if (typeof showNotice === "function") {
+      showNotice("Automatic SOS calling is available in the installed Android app. A browser cannot place a call without user interaction.", "warning");
+    }
   } catch (e) {
-    window.location.href = "tel:" + savedNumber;
+    if (typeof showNotice === "function") {
+      showNotice("Automatic calling could not start. Check the installed Android app and Phone permission.", "error");
+    }
   }
 }
 
