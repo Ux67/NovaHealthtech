@@ -1,17 +1,14 @@
 """
-Nova Healthtech - Automatic Accident Detection, 8-Second Auto-SOS & Direct Ambulance Call Service
+Nova Healthtech - Automatic Accident Detection, 8-Second Auto-SOS Incident Service
 - Stores SOS incidents, cancellations, and trusted emergency contacts in SQLite.
 - Evaluates sensor-fusion telemetry and triggers the 8-second auto-call & location share countdown.
-- Automatically places the 108 call AND sends KEYCODE_CALL (input keyevent 5) to press the green
-  dialer button automatically on Android when connected via USB or Wi-Fi ADB.
+- Records SOS incidents and location data. Native Android handles any permitted call to the saved contact.
 """
 
 import json
 import os
 import re
 import sqlite3
-import subprocess
-import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -89,65 +86,6 @@ def build_google_maps_url(
     if clean_query:
         return f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(clean_query)}"
     return ""
-
-
-def attempt_direct_android_call(phone_number: str = "108", client_ip: str = "") -> Tuple[bool, str]:
-    """
-    Automatically places a direct cellular call to `108` on a connected Android phone AND
-    sends `KEYCODE_CALL` (input keyevent 5) so that even if Android's Emergency Dialer
-    intercepts `108` and shows the green Call button, the green Call button is pressed
-    automatically without human interaction.
-    """
-    clean_num = re.sub(r"[^0-9+]", "", str(phone_number)) or "108"
-    try:
-        # If the phone is connected over Wi-Fi Hotspot (like in 22408.jpg) with Wireless ADB on port 5555,
-        # attempt a quick non-blocking connect first.
-        if client_ip and client_ip not in ("127.0.0.1", "::1", "localhost"):
-            try:
-                subprocess.run(
-                    ["adb", "connect", f"{client_ip}:5555"],
-                    capture_output=True,
-                    text=True,
-                    timeout=1.5,
-                )
-            except Exception:
-                pass
-
-        # Step 1: Wake screen if asleep and launch the call intent for 108
-        subprocess.run(
-            ["adb", "shell", "input", "keyevent", "224"],  # KEYCODE_WAKEUP
-            capture_output=True,
-            text=True,
-            timeout=2,
-        )
-        res = subprocess.run(
-            ["adb", "shell", "am", "start", "-a", "android.intent.action.CALL", "-d", f"tel:{clean_num}"],
-            capture_output=True,
-            text=True,
-            timeout=3,
-        )
-
-        # Step 2: Because Android treats 108 as an Emergency Response Service number and often stops
-        # on the dialer keypad with '108' pre-filled, wait 1.2s and send KEYCODE_CALL (keyevent 5)
-        # which automatically presses the green Call button!
-        time.sleep(1.2)
-        call_key_res = subprocess.run(
-            ["adb", "shell", "input", "keyevent", "5"],  # KEYCODE_CALL (Presses the green call button)
-            capture_output=True,
-            text=True,
-            timeout=2,
-        )
-
-        if (res.returncode == 0 or call_key_res.returncode == 0) and "error:" not in (
-            res.stderr + call_key_res.stderr
-        ).lower():
-            return (
-                True,
-                f"Direct cellular call to {clean_num} initiated automatically (KEYCODE_CALL auto-pressed green button).",
-            )
-    except Exception:
-        pass
-    return False, ""
 
 
 def evaluate_sensor_fusion_payload(sensor_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -287,24 +225,19 @@ def create_or_update_sos_incident(
                     dispatch_confirmed = True
                     dispatch_msg = f"Authorized Dispatch Confirmed (Ref: {resp_data.get('dispatch_id', 'OK')})."
                 else:
-                    dispatch_msg = "Location packet transmitted; initiating 108 voice call."
+                    dispatch_msg = "Location packet transmitted; calling is handled by the native Android app."
         except Exception as e:
-            dispatch_msg = f"Location packet recorded locally ({str(e)[:45]}); initiating 108 voice call."
+            dispatch_msg = f"Location packet recorded locally ({str(e)[:45]}); native Android calling was not confirmed."
         inc_status = "DISPATCH_CONFIRMED" if dispatch_confirmed else "AUTO_CALL_INITIATED"
     else:
         dispatch_msg = (
-            "GPS location packet recorded & copied for 108 Ambulance; "
-            "automatic 108 ambulance call triggered after 8-second countdown."
+            "GPS location packet recorded. Native Android is responsible for calling the saved contact after countdown."
         )
         inc_status = "AUTO_CALL_INITIATED"
 
+    # The backend only records the incident and location. Native Android owns calling.
+    # Never place calls from the server or substitute a default telephone number.
     direct_call_placed = False
-    if not is_simulation and bool(payload.get("place_direct_phone_call", True)):
-        target_num = str(payload.get("target_ambulance_number", "108")).strip() or "108"
-        direct_ok, direct_note = attempt_direct_android_call(target_num, client_ip=client_key)
-        if direct_ok:
-            direct_call_placed = True
-            dispatch_msg = f"{direct_note} | {dispatch_msg}"
 
     now_iso = datetime.now(timezone.utc).isoformat()
     with sqlite3.connect(SOS_DB_PATH) as conn:
