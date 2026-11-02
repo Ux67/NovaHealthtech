@@ -1815,6 +1815,7 @@ class AIAssistantService:
         lang_code: str,
         lang_name: str,
         api_key: str,
+        history: Optional[List[Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
         cleaned_title = re.sub(
             r"^(what is the use of|what are the uses of|what are the side effects of|what is|tell me about|uses of|side effects of|contraindications of|interactions of|ingredients of|explain|details of)\s+",
@@ -1849,7 +1850,9 @@ class AIAssistantService:
         else:
             web_med = self._search_live_web_for_indian_brand(cleaned_title, base_drug)
             wiki_med = self._fetch_live_web_medical_data(base_drug)
-            llm_med = self._call_llm_for_medicine_or_disease(en_query, "MEDICINE", web_med.get("uses", "") + "\n" + wiki_med.get("overview", ""), api_key)
+            llm_med = self._call_llm_for_medicine_or_disease(
+                en_query, "MEDICINE", web_med.get("uses", ""), api_key, history=history
+            )
 
             if llm_med:
                 sections_llm = [
@@ -1940,8 +1943,28 @@ class AIAssistantService:
         lang_code: str,
         lang_name: str,
         api_key: str,
+        history: Optional[List[Dict[str, str]]] = None,
     ) -> Dict[str, Any]:
         q = en_query.lower()
+        if api_key:
+            llm_answer = self._call_llm_for_medicine_or_disease(
+                en_query, "MEDICINE", "", api_key, history=history
+            )
+            if llm_answer:
+                english_reply = strip_latex_artifacts(
+                    "**Nova AI • Medicine and treatment information**\n\n"
+                    + llm_answer + "\n\n" + MANDATORY_MEDICINE_WARNING.strip()
+                )
+                final_reply = translate_multiline_response(english_reply, target_lang=lang_code) if lang_code != "en" else english_reply
+                return {
+                    "source": "nova_ai_medicine_for_cause",
+                    "model": "AI Online • Medical Companion",
+                    "api_connected": True,
+                    "language": lang_code,
+                    "reply": strip_latex_artifacts(final_reply),
+                    "english_reply": english_reply,
+                    "safety_disclaimer": "Medical information only • No personalized prescribing",
+                }
         if any(w in q for w in ["fever", "temperature", "body ache", "headache"]):
             cause_title = "Fever, Body Ache & Headache"
             med_discussion = (
@@ -2085,6 +2108,7 @@ class AIAssistantService:
                 lang_code=lang_code,
                 lang_name=lang_name,
                 api_key=api_key,
+                history=history,
             )
 
         if intent_mode == "MEDICINE_FOR_CAUSE":
@@ -2094,6 +2118,7 @@ class AIAssistantService:
                 lang_code=lang_code,
                 lang_name=lang_name,
                 api_key=api_key,
+                history=history,
             )
 
         # ======================================================================
@@ -2112,8 +2137,7 @@ class AIAssistantService:
                 english_reply = strip_latex_artifacts(
                     f"🩺 **Nova AI • Clinical Disease & Symptom Guidance: {topic.title()}**\n\n"
                     f"{llm_disease}\n\n"
-                    "ℹ️ *Note: Disease guidance is kept separate from medicine prescriptions. Always consult a registered physician (MBBS/MD) for confirmed diagnosis and treatment.*"
-                    + ASK_USER_LOCATION_PROMPT
+                    "ℹ️ *This is educational information, not a diagnosis. A qualified clinician can assess your individual situation.*"
                 )
                 final_reply = translate_multiline_response(english_reply, target_lang=lang_code) if lang_code != "en" else english_reply
                 return {
@@ -2201,8 +2225,7 @@ class AIAssistantService:
             f"**4. Precautions, Prevention & Supportive Self-Care:**\n{precautions}",
             f"👨‍⚕️ **5. Doctor & Specialist Recommendation:**\n{doctor_rec}",
             f"🏥 **6. Hospital Recommendations & Emergency Helplines:**\n{hospital_helpline_rec}",
-            "ℹ️ *Clinical Separation Note: In accordance with medical safety standards, general disease guidance does not prescribe or recommend specific medicines. If you want information on a specific medicine, enter the medicine's name directly.*"
-            + ASK_USER_LOCATION_PROMPT,
+            "ℹ️ *This is educational information, not a diagnosis. Ask about a medicine by its exact brand or generic name when you want a medicine-specific explanation.*",
         ]
 
         english_reply = strip_latex_artifacts("\n\n".join(sections))
