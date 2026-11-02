@@ -530,7 +530,7 @@ class AccidentDetectionService : Service(), SensorEventListener {
                 "Nova Critical SOS Countdown Alerts",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Emergency countdown with automatic calling when enabled and permitted."
+                description = "Emergency countdown and saved-contact dialer alert. Calls require user confirmation."
                 enableVibration(true)
                 setSound(alarmSound, audioAttrs)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
