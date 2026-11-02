@@ -1527,13 +1527,6 @@ main strong,
 .triage-module {
   color: #F1F5F9;
 }
-.control-input,
-.control-select,
-input,
-textarea,
-select {
-  color: #172033;
-}
 .control-input::placeholder,
 input::placeholder,
 textarea::placeholder {
