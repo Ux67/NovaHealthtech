@@ -2353,11 +2353,13 @@ class MainActivity : AppCompatActivity() {
                     bgBtn.style.color = "#FFFFFF";
                 }
 
-                document.querySelectorAll('a[href^="tel:108"], #call108NowBtn').forEach(el => {
-                    if (el.closest("#hospitalsGrid") || el.closest("#medicineStoresGrid")) return;
-                    el.textContent = savedNum ? ("📞 Call " + savedName + " (" + savedNum + ")") : "Save SOS Number";
-                    el.setAttribute("href", savedNum ? ("tel:" + savedNum) : "javascript:window.__openFeatureScreen('sos')");
-                });
+                // Only the countdown's saved-contact action follows the stored contact.
+                // The top emergency bar and all explicit 108 links remain unchanged.
+                const savedContactAction = document.getElementById("sosDirectCall108");
+                if (savedContactAction) {
+                    savedContactAction.textContent = savedNum ? ("📞 Call " + savedName + " (" + savedNum + ")") : "Save SOS Number";
+                    savedContactAction.href = savedNum ? ("tel:" + savedNum) : "javascript:window.__openFeatureScreen('sos')";
+                }
             };
 
             function mountNavigationDrawerAndModals() {
