@@ -867,7 +867,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQ_CODE) {
             syncBackgroundServiceState()
-
+        }
     }
 
     private fun injectNovaStandaloneEngine() {
