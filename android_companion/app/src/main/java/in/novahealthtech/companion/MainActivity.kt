@@ -1829,6 +1829,14 @@ class MainActivity : AppCompatActivity() {
                                 }), { status: 400, headers: { 'Content-Type': 'application/json' } });
                             }
                             const controller = new AbortController();
+                            const callerSignal = init && init.signal;
+                            if (callerSignal) {
+                                if (callerSignal.aborted) {
+                                    controller.abort();
+                                } else {
+                                    callerSignal.addEventListener("abort", () => controller.abort(), { once: true });
+                                }
+                            }
                             timeoutId = setTimeout(() => controller.abort(), 30000);
                             const requestInit = Object.assign({}, init || {}, {
                                 signal: controller.signal,
