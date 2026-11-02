@@ -1054,7 +1054,7 @@ function triggerAutomaticAmbulanceCall() {
   const savedNumber = window.__getSavedSosAutoCallNumber
     ? String(window.__getSavedSosAutoCallNumber() || "").replace(/[^0-9+]/g, "")
     : "";
-  if (!savedNumber || !/^\\+?[0-9]{7,15}$/.test(savedNumber)) {
+  if (!savedNumber || !/^\+?[0-9]{7,15}$/.test(savedNumber)) {
     if (typeof showNotice === "function") showNotice("No valid emergency contact is saved. No call was placed.", "warning");
     return;
   }
@@ -2143,7 +2143,7 @@ function triggerAutomaticAmbulanceCall() {
   const savedNumber = window.__getSavedSosAutoCallNumber
     ? String(window.__getSavedSosAutoCallNumber() || "").replace(/[^0-9+]/g, "")
     : "";
-  if (!savedNumber || !/^\\+?[0-9]{7,15}$/.test(savedNumber)) {
+  if (!savedNumber || !/^\+?[0-9]{7,15}$/.test(savedNumber)) {
     if (typeof showNotice === "function") showNotice("No valid emergency contact is saved. No call was placed.", "warning");
     return;
   }
