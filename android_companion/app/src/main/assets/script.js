@@ -1055,23 +1055,12 @@ function triggerAutomaticAmbulanceCall() {
     ? String(window.__getSavedSosAutoCallNumber() || "").replace(/[^0-9+]/g, "")
     : "";
   if (!savedNumber || !/^\+?[0-9]{7,15}$/.test(savedNumber)) {
-    if (typeof showNotice === "function") showNotice("No valid emergency contact is saved. No call was placed.", "warning");
+    if (typeof showNotice === "function") showNotice("SOS alert recorded, but no valid saved contact is configured. No call was placed.", "warning");
     return;
   }
-  try {
-    if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
-      // The Android bridge resolves the destination again from the native saved-contact store.
-      window.NovaAndroidBridge.placeDirectCall(savedNumber);
-      return;
-    }
-    // Browsers cannot place calls silently. Never open a dialer as an automatic-call fallback.
-    if (typeof showNotice === "function") {
-      showNotice("Automatic SOS calling is available in the installed Android app. A browser cannot place a call without user interaction.", "warning");
-    }
-  } catch (e) {
-    if (typeof showNotice === "function") {
-      showNotice("Automatic calling could not start. Check the installed Android app and Phone permission.", "error");
-    }
+  // Do not dial automatically. The SOS report provides an explicit saved-contact dialer action.
+  if (typeof showNotice === "function") {
+    showNotice("SOS alert recorded. Tap Open Saved Contact Dialer in the report to place the call.", "info");
   }
 }
 
@@ -1145,25 +1134,22 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
         <div class="recommendation-item">
           <span class="recommendation-match">${
             inc.is_simulation
-              ? "🧪 8s AUTO-SHARE SIMULATION COMPLETED"
-              : "🚨 8s COUNTDOWN COMPLETE — SAVED-CONTACT CALL & LOCATION SHARED"
+              ? "🧪 8s SOS SIMULATION COMPLETED"
+              : "🚨 8s COUNTDOWN COMPLETE — SOS INCIDENT RECORDED"
           }</span>
           <h4>Incident Reference: ${inc.incident_uuid}</h4>
-          <p><strong>Direct Ambulance Call Status:</strong> ${
-            inc.direct_call_placed
-              ? "🟢 Automatic call requested for the saved emergency contact."
-              : inc.is_simulation
-              ? "Simulation Mode checked — call suppressed for safe testing."
-              : "Automatic call requested for the saved emergency contact after the 8-second countdown."
+          <p><strong>Saved Contact Call Status:</strong> ${
+            inc.is_simulation
+              ? "Simulation Mode checked. No call was started."
+              : "No call has been placed automatically. Tap below to open the saved contact in Android's dialer, then confirm the call."
           }</p>
-          <p><strong>Location Automatically Shared with Ambulance:</strong> <code>${locDescription}</code> (${loc.location_source})</p>
+          <p><strong>Location Captured for SOS Incident:</strong> <code>${locDescription}</code> (${loc.location_source}). This location has been recorded by Nova Healthtech; it has not been transmitted to an ambulance dispatch service.</p>
           <p><strong>Dispatch Telemetry Status:</strong> ${inc.dispatch_status_message}</p>
           <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.55rem;">
-            <a href="tel:108" class="btn-emergency">📞 Redial 108 (Ambulance)</a>
-            <a href="tel:112" class="btn-emergency btn-emergency--secondary">📞 Call 112 (ERSS)</a>
+            ${!inc.is_simulation ? `<button type="button" class="btn-emergency" onclick="window.__callDbEmergencyNumberNow && window.__callDbEmergencyNumberNow()">📞 Open Saved Contact Dialer</button>` : ""}
             ${
               loc.maps_url
-                ? `<a href="${loc.maps_url}" target="_blank" rel="noopener noreferrer" class="btn-official-portal">🗺️ Shared Ambulance Map Link ↗</a>`
+                ? `<a href="${loc.maps_url}" target="_blank" rel="noopener noreferrer" class="btn-official-portal">🗺️ Open SOS Location Map ↗</a>`
                 : ""
             }
           </div>
@@ -1179,7 +1165,11 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
   } catch (err) {
     if (reportBox) {
       reportBox.hidden = false;
-      reportBox.innerHTML = `<p><strong>🚨 8s Countdown Complete (Offline Mode):</strong> Review the emergency number in your phone dialer and tap Call.</p>`;
+      reportBox.innerHTML = `
+        <p><strong>🚨 SOS alert could not sync with the backend.</strong> No call was placed automatically.</p>
+        <p>Tap below to open your saved contact in Android's dialer and confirm the call.</p>
+        <button type="button" class="btn-emergency" onclick="window.__callDbEmergencyNumberNow && window.__callDbEmergencyNumberNow()">📞 Open Saved Contact Dialer</button>
+      `;
       stampEnglishBaseline(reportBox);
     }
     if (!isSim) {
@@ -2187,88 +2177,7 @@ async function initHealthCheck() {
 }
 
 // ============================================================================
-// AUTOMATIC ACCIDENT DETECTION & 8-SECOND AUTO-DIAL SAVED EMERGENCY CONTACT MODULE
-// ============================================================================
-
-function triggerAutomaticAmbulanceCall() {
-  const savedNumber = window.__getSavedSosAutoCallNumber
-    ? String(window.__getSavedSosAutoCallNumber() || "").replace(/[^0-9+]/g, "")
-    : "";
-  if (!savedNumber || !/^\+?[0-9]{7,15}$/.test(savedNumber)) {
-    if (typeof showNotice === "function") showNotice("No valid emergency contact is saved. No call was placed.", "warning");
-    return;
-  }
-  try {
-    if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
-      // The Android bridge resolves the destination again from the native saved-contact store.
-      window.NovaAndroidBridge.placeDirectCall(savedNumber);
-      return;
-    }
-    // Browsers cannot place calls silently. Never open a dialer as an automatic-call fallback.
-    if (typeof showNotice === "function") {
-      showNotice("Automatic SOS calling is available in the installed Android app. A browser cannot place a call without user interaction.", "warning");
-    }
-  } catch (e) {
-    if (typeof showNotice === "function") {
-      showNotice("Automatic calling could not start. Check the installed Android app and Phone permission.", "error");
-    }
-  }
-}
-
-async function executeSosEscalation(triggerSource, sensorPayload) {
-    const incidentId = activeIncidentUuid || `sos-${Date.now()}`;
-    if (isSosEscalationInFlight || executedIncidentUuids.has(incidentId)) {
-        return;
-    }
-    isSosEscalationInFlight = true;
-    executedIncidentUuids.add(incidentId);
-
-    const isSim = document.getElementById("sosSafeSimulationToggle")?.checked ?? false;
-    const manualLoc = document.getElementById("sosManualAddressInput")?.value.trim() || "";
-    const modal = document.getElementById("sosCountdownModal");
-    const reportBox = document.getElementById("sosDispatchReportBox");
-    if (modal) modal.hidden = true;
-
-    const hasGps = latestGpsPosition && latestGpsPosition.latitude !== null && latestGpsPosition.longitude !== null;
-    const locSource = hasGps ? latestGpsPosition.source : (manualLoc ? "manual_landmark_fallback" : "unavailable");
-
-    const payload = {
-        incident_uuid: incidentId,
-        trigger_source: triggerSource,
-        is_simulation: isSim,
-        auto_triggered_after_8s: true,
-        place_direct_phone_call: !isSim,
-        target_ambulance_number: (window.__getSavedSosAutoCallNumber ? window.__getSavedSosAutoCallNumber() : ""),
-        latitude: hasGps ? latestGpsPosition.latitude : null,
-        longitude: hasGps ? latestGpsPosition.longitude : null,
-        accuracy_meters: hasGps ? latestGpsPosition.accuracy_meters : null,
-        location_source: locSource,
-        manual_location_text: manualLoc,
-        sensor_data: sensorPayload || {}
-    };
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/sos/incident`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        const inc = data.incident || {};
-
-        if (!isSim) {
-            triggerAutomaticAmbulanceCall();
-        }
-    } catch (err) {
-        if (!isSim) {
-            triggerAutomaticAmbulanceCall();
-        }
-    } finally {
-        isSosEscalationInFlight = false;
-    }
-}
-
-// ============================================================================
+// Duplicate SOS handler removed. The primary cancellable SOS workflow above is authoritative.
 // NOVA HEALTHTECH: CONFIGURABLE EMERGENCY SOS AUTO-CALL NUMBER ONLY
 // - Scoped strictly to the automatic SOS countdown calling feature.
 // - Supports entering, saving, changing, and removing a valid phone number.
