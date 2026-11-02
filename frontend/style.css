@@ -1681,3 +1681,17 @@ main p, main li, main label, main small,
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
 }
+
+/* Medication reminder card contrast: keep medicine and dose details readable. */
+.med-card,
+.med-card__info,
+.med-card__info h4,
+.med-card__info p,
+.med-card__info .med-meta,
+.med-card__info .med-meta strong {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+.med-card__info h4 { font-weight: 800 !important; }
+.med-card__info .med-meta { color: #F1F5F9 !important; }
