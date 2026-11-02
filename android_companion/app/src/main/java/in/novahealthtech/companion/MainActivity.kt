@@ -638,16 +638,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleCustomAndExternalSchemes(url: String): Boolean {
         if (url.startsWith("tel:")) {
+            // Explicit tel: links must dial exactly the number the user selected.
+            // Automatic SOS uses NovaJsBridge.placeDirectCall(), which resolves only the saved contact.
             val rawNum = Uri.decode(url.removePrefix("tel:")).trim()
-            if (rawNum.isEmpty() || rawNum == "108") {
-                val saved = getSavedPermanentSosNumber()
-                if (saved.isEmpty()) {
-                    showConfigureEmergencyContactPrompt()
-                } else {
-                    executeDirectHardwareCall(saved)
-                }
-                return true
-            }
+            if (rawNum.isEmpty()) return true
             executeDirectHardwareCall(rawNum)
             return true
         }
@@ -792,7 +786,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun executeDirectHardwareCall(phoneNumber: String) {
         val cleanNumber = phoneNumber.replace(Regex("[^0-9+]"), "")
-        if (cleanNumber.isEmpty() || cleanNumber == "108") {
+        if (cleanNumber.isEmpty()) {
             showConfigureEmergencyContactPrompt()
             return
         }
