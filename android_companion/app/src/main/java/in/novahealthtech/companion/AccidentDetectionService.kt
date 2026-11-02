@@ -158,9 +158,8 @@ class AccidentDetectionService : Service(), SensorEventListener {
                     targetNumber,
                     getSavedEmergencyName()
                 )
-                // Countdown expired and the user did not cancel. Place the opted-in call
-                // through Android Telecom, without opening or tapping another dialer app.
-                executeBackgroundEmergencyCall(targetNumber, candidateImpactPeakMs2)
+                // Countdown expiry raises a persistent alert. A person must tap OPEN DIALER
+                // and then confirm the call in Android's phone app.
                 return
             }
             showHighPriorityCountdownNotification(
@@ -202,10 +201,7 @@ class AccidentDetectionService : Service(), SensorEventListener {
                 currentState = DetectorState.MONITORING
                 lastTriggerCompletedAtMs = System.currentTimeMillis()
                 cancelAlertNotification()
-                executeBackgroundEmergencyCall(
-                    getSavedEmergencyNumber(),
-                    candidateImpactPeakMs2.coerceAtLeast(55.0f)
-                )
+                openSavedNumberInDialer(getSavedEmergencyNumber())
                 return START_STICKY
             }
         }
@@ -423,58 +419,24 @@ class AccidentDetectionService : Service(), SensorEventListener {
         releaseWakeLock()
     }
 
-    @SuppressLint("MissingPermission")
-    private fun executeBackgroundEmergencyCall(emergencyNumber: String, peakAccelMs2: Float) {
-        if (!NovaAutoCallCoordinator.isAppInForeground && !isBackgroundAutoCallingAllowed()) {
-            return
-        }
-
+    private fun openSavedNumberInDialer(emergencyNumber: String) {
         val cleanNumber = emergencyNumber.replace(Regex("[^0-9+]"), "")
         if (cleanNumber.isEmpty() || cleanNumber == "108") {
             Toast.makeText(
                 applicationContext,
-                "SOS Triggered: No emergency contact number saved. Configure a contact in Nova Healthtech.",
+                "No valid saved emergency contact is available. Please configure one in Nova Healthtech.",
                 Toast.LENGTH_LONG
             ).show()
-            try {
-                val configUi = Intent(this, MainActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                }
-                startActivity(configUi)
-            } catch (_: Exception) {}
             return
         }
-
-        // This function runs after the 8-second countdown, or from the explicit Call action.
-        // CALL_PHONE permission is requested in MainActivity during setup.
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            showCallPermissionMissingNotification(cleanNumber)
-            return
-        }
-        val callPrefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val now = System.currentTimeMillis()
-        val lastAttempt = callPrefs.getLong(KEY_LAST_CALL_ATTEMPT_AT_MS, 0L)
-        if (now - lastAttempt < 60_000L) return
-        callPrefs.edit().putLong(KEY_LAST_CALL_ATTEMPT_AT_MS, now).apply()
+        // This method is only reached from the user's explicit OPEN DIALER notification action.
         try {
-            val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            telecomManager.placeCall(
-                Uri.fromParts("tel", cleanNumber, null),
-                Bundle().apply {
-                    putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
-                }
-            )
-            return
-        } catch (_: Exception) {
-            // If Android's Telecom API is unavailable, try its native call intent.
-        }
-        try {
-            val callIntent = Intent(Intent.ACTION_CALL, Uri.fromParts("tel", cleanNumber, null)).apply {
+            val dialIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null)).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-            startActivity(callIntent)
+            startActivity(dialIntent)
         } catch (_: Exception) {
-            showCallPermissionMissingNotification(cleanNumber)
+            Toast.makeText(applicationContext, "Unable to open the phone dialer.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -652,16 +614,16 @@ class AccidentDetectionService : Service(), SensorEventListener {
         val peakFormatted = String.format("%.1f", peakMs2)
         val hasTarget = targetNum.isNotEmpty()
         val titleText = if (hasTarget) {
-            "POTENTIAL EMERGENCY ($peakFormatted m/s²) — AUTO-CALL COUNTDOWN"
+            "POTENTIAL EMERGENCY ($peakFormatted m/s²) — SAVED CONTACT ALERT"
         } else {
             "SEVERE IMPACT ($peakFormatted m/s²) — NO SOS CONTACT SAVED"
         }
         val bodyText = if (hasTarget) {
-            (if (secondsLeft > 0) "Possible severe impact. Review the alert. $secondsLeft seconds remaining; tap CANCEL if safe." else "Countdown complete. Nova is attempting to call your saved emergency contact.")
+            (if (secondsLeft > 0) "Possible severe impact. Review the alert. $secondsLeft seconds remaining; tap I AM SAFE if this is not an emergency." else "Countdown complete. Tap OPEN DIALER to contact your saved emergency contact.")
         } else {
             "No emergency contact configured (${secondsLeft}s). Tap to configure contact."
         }
-        val callBtnLabel = if (hasTarget) "CALL NOW" else "CONFIGURE CONTACT"
+        val callBtnLabel = if (hasTarget) "OPEN DIALER" else "CONFIGURE CONTACT"
 
         val alertNotif = NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_warning)
