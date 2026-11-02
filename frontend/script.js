@@ -1672,7 +1672,19 @@ async function loadActiveReminders() {
     const res = await fetch(`${API_BASE_URL}/api/reminders`, { cache: "no-store" });
     if (!res.ok) return;
     const data = await res.json();
-    renderRemindersUI(data.reminders || []);
+    const reminders = data.reminders || [];
+    // Native APK medication alarms are synced from the active reminder list.
+    if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.scheduleMedicationReminder === "function") {
+      reminders.forEach((med) => {
+        if (med.id != null && med.medicine_name && med.scheduled_time) {
+          window.NovaAndroidBridge.scheduleMedicationReminder(
+            String(med.id), String(med.medicine_name), String(med.prescribed_dosage || ""),
+            String(med.scheduled_time), String(med.meal_relation || ""), String(med.notes || "")
+          );
+        }
+      });
+    }
+    renderRemindersUI(reminders);
   } catch (err) {}
 }
 
@@ -1712,6 +1724,9 @@ function renderRemindersUI(list) {
       if (currentLang !== "en") await translateWholePageAndChat(currentLang);
     });
     delBtn.addEventListener("click", async () => {
+      if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.cancelMedicationReminder === "function") {
+        window.NovaAndroidBridge.cancelMedicationReminder(String(med.id));
+      }
       await fetch(`${API_BASE_URL}/api/reminders/${med.id}`, { method: "DELETE" });
       await loadActiveReminders();
       if (currentLang !== "en") await translateWholePageAndChat(currentLang);
