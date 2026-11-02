@@ -74,7 +74,12 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setContentIntent(openApp)
             .build()
-        manager.notify(id.hashCode(), notification)
+        // Spoken reminder should still run if notification permission is denied.
+        try {
+            manager.notify(id.hashCode(), notification)
+        } catch (_: SecurityException) {
+            // Android notification permission is optional; TextToSpeech remains available.
+        }
     }
 
     private fun speakReminder(context: Context, name: String, dose: String, meal: String) {
