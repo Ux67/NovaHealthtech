@@ -2373,7 +2373,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                             fb.style.color = "#fda4af";
                             fb.textContent = "⚠️ SOS Auto-Call Paused: No emergency contact number is saved. Please enter and save a valid phone number below.";
                         }
-                        showNotice("⚠️ No Emergency Contact Configured!\n\nPlease enter and save an emergency contact phone number in the 'Emergency SOS Auto-Call Contact Number' box to enable automatic calling.");
+                        showNotice("No emergency contact is configured. Save a trusted contact before using the SOS dialer action.", "warning");
                         document.getElementById("novaCustomSosNumInput")?.focus();
                     }
                 }
@@ -3608,7 +3608,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                                 window.NovaAndroidBridge.placeDirectCall(savedTargetNum);
                                 callPlaced = true;
                             }
-                            statusMsg = "Emergency Auto-Caller dialing " + savedTargetName + " (" + savedTargetNum + ").";
+                            statusMsg = "Emergency dialer opened for " + savedTargetName + " (" + savedTargetNum + "). Review and tap Call to continue.";
                         }
 
                         return new Response(JSON.stringify({
@@ -3918,14 +3918,14 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
 
                 const titleMap = {
                     all: "All Features (Stacked View)",
-                    sos: "Emergency SOS & Auto-Call Config",
+                    sos: "Emergency SOS & Contact Settings",
                     ai: "AI Clinical Assistant & Memory",
                     triage: "Emergency Symptom Triage",
                     guides: "First-Aid & Emergency Guides",
                     directory: "36 States Hospitals & Pharmacies",
                     consult: "Doctor Callback Consultation",
                     reminders: "Medicine Dosage Reminders",
-                    accessibility: "Accessibility & Background Auto-Call"
+                    accessibility: "Emergency & Background Monitoring"
                 };
 
                 const titleEl = document.getElementById("novaAppBarSectionTitle");
@@ -4033,7 +4033,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
 
                 const bgBtn = document.getElementById("novaBgAutoCallToggleBtn");
                 if (bgBtn) {
-                    bgBtn.textContent = bgEnabled ? "Turn Background Auto-Call OFF" : "Turn Background Auto-Call ON";
+                    bgBtn.textContent = bgEnabled ? "Turn Background Monitoring OFF" : "Turn Background Monitoring ON";
                     bgBtn.style.background = bgEnabled ? "#DC2626" : "#1D4ED8";
                     bgBtn.style.color = "#FFFFFF";
                 }
@@ -4087,14 +4087,14 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                             '<button type="button" onclick="window.__closeNavDrawer()" style="background:#F1F5F9 !important; color:#475569 !important; padding:0.3rem 0.6rem !important; width:auto !important;">✕</button>' +
                         '</div>' +
                         '<button type="button" class="nova-drawer-item active" data-feature="all" onclick="window.__openFeatureScreen(\'all\')">🏠 Main Website (Stacked Dropdowns)</button>' +
-                        '<button type="button" class="nova-drawer-item" data-feature="sos" onclick="window.__openFeatureScreen(\'sos\')">🚨 Emergency SOS &amp; Auto-Call Number</button>' +
+                        '<button type="button" class="nova-drawer-item" data-feature="sos" onclick="window.__openFeatureScreen(\'sos\')">🚨 Emergency SOS &amp; Contact Number</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="ai" onclick="window.__openFeatureScreen(\'ai\')">🧠 AI Health Assistant &amp; Memory</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="triage" onclick="window.__openFeatureScreen(\'triage\')">⚡ Emergency Symptom Triage</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="guides" onclick="window.__openFeatureScreen(\'guides\')">🩹 First-Aid &amp; Emergency Guides</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="directory" onclick="window.__openFeatureScreen(\'directory\')">🏥 36 States Hospitals &amp; Pharmacies</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="consult" onclick="window.__openFeatureScreen(\'consult\')">👨‍⚕️ Doctor Callback Consultation</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="reminders" onclick="window.__openFeatureScreen(\'reminders\')">⏰ Medicine Dosage Reminders</button>' +
-                        '<button type="button" class="nova-drawer-item" data-feature="accessibility" onclick="window.__openFeatureScreen(\'accessibility\')">⚙️ Accessibility &amp; Background Auto-Call</button>' +
+                        '<button type="button" class="nova-drawer-item" data-feature="accessibility" onclick="window.__openFeatureScreen(\'accessibility\')">⚙️ Emergency &amp; Background Monitoring</button>' +
                         '<div style="margin-top:auto; padding-top:0.85rem; border-top:1px solid #E2E8F0;">' +
                             '<button id="novaDrawerLoginBtn" type="button" onclick="window.__openLoginDashboardScreen()" style="width:100% !important;">Log In / Sign Up</button>' +
                         '</div>';
@@ -4194,7 +4194,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                     const accSec = document.createElement("section");
                     accSec.id = "novaStandaloneAccessibilityScreen";
                     accSec.innerHTML =
-                        '<h2>⚙️ Accessibility &amp; Background Auto-Calling</h2>' +
+                        '<h2>⚙️ Emergency &amp; Background Monitoringing</h2>' +
                         '<p style="margin-bottom:0.8rem;">Control whether Emergency Auto-Caller continues monitoring severe ground impacts and placing automatic calls to your saved contact after the app is closed.</p>' +
                         '<div style="padding:0.95rem; border-radius:10px; background:#F8FAFC; border:1px solid #E2E8F0;">' +
                             '<div style="font-size:0.78rem; color:#64748B; margin-bottom:0.2rem;">Background Auto-Call Status:</div>' +
