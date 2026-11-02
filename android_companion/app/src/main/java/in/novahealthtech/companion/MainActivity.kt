@@ -794,29 +794,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun executeDirectHardwareCall(phoneNumber: String) {
-        val now = System.currentTimeMillis()
-        if (now - lastAutoCallTimestampMs < 6000L) return
         val cleanNumber = phoneNumber.replace(Regex("[^0-9+]"), "")
         if (cleanNumber.isEmpty() || cleanNumber == "108") {
             showConfigureEmergencyContactPrompt()
             return
         }
-        lastAutoCallTimestampMs = now
-        val dialIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null))
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Automatic calling needs the Phone permission. Enable it in Android app permissions.", Toast.LENGTH_LONG).show()
+            try { startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null))) } catch (_: Exception) {}
+            return
+        }
+        val prefs = getSharedPreferences(NovaAutoCallCoordinator.PREFS_NAME, Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        val lastAttempt = prefs.getLong(AccidentDetectionService.KEY_LAST_CALL_ATTEMPT_AT_MS, 0L)
+        if (now - lastAttempt < 60_000L) return
+        prefs.edit().putLong(AccidentDetectionService.KEY_LAST_CALL_ATTEMPT_AT_MS, now).apply()
         try {
-            AlertDialog.Builder(this)
-                .setTitle("Emergency call ready")
-                .setMessage("Nova Healthtech is ready to open the phone dialer for your saved emergency contact. Review the number and tap Call in the phone app to place the call.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Open dialer") { _, _ ->
-                    try { startActivity(dialIntent) } catch (_: Exception) {
-                        Toast.makeText(this, "Unable to open the phone dialer on this device.", Toast.LENGTH_LONG).show()
-                    }
-                }
-                .show()
+            val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            telecomManager.placeCall(Uri.fromParts("tel", cleanNumber, null), android.os.Bundle())
         } catch (_: Exception) {
-            try { startActivity(dialIntent) } catch (_: Exception) {
-                Toast.makeText(this, "Unable to open the phone dialer on this device.", Toast.LENGTH_LONG).show()
+            try {
+                startActivity(Intent(Intent.ACTION_CALL, Uri.fromParts("tel", cleanNumber, null)))
+            } catch (_: Exception) {
+                Toast.makeText(this, "Unable to place the emergency call. Use your phone's emergency calling feature.", Toast.LENGTH_LONG).show()
             }
         }
     }
