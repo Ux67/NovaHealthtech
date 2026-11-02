@@ -378,7 +378,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var dbHelper: EmergencyContactDbHelper
-    private var pendingAutoCallNumber: String? = null
     private var lastAutoCallTimestampMs: Long = 0L
     private var accessibilityDialogShown: Boolean = false
 
@@ -386,7 +385,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val PERMISSION_REQ_CODE = 1080
-        private const val CALL_PERMISSION_ONLY_REQ_CODE = 1082
     }
 
     private fun getSavedPermanentSosNumber(): String {
@@ -845,8 +843,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkPermissionsAndStartServiceSafely() {
         val needed = mutableListOf(
-            Manifest.permission.CALL_PHONE,
-            Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
@@ -871,13 +867,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQ_CODE) {
             syncBackgroundServiceState()
-        } else if (requestCode == CALL_PERMISSION_ONLY_REQ_CODE) {
-            val target = pendingAutoCallNumber ?: getSavedPermanentSosNumber()
-            pendingAutoCallNumber = null
-            if (target.isNotEmpty() && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                executeDirectHardwareCall(target)
-            }
-        }
+
     }
 
     private fun injectNovaStandaloneEngine() {
