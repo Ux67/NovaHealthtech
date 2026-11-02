@@ -1451,3 +1451,12 @@ body.low-bandwidth .glass-panel {
     width: 100%;
   }
 }
+/* Accessible non-blocking notices */
+.nova-notice-region { position:fixed; z-index:10000; top:max(1rem,env(safe-area-inset-top)); right:max(1rem,env(safe-area-inset-right)); width:min(24rem,calc(100vw - 2rem)); display:grid; gap:.65rem; pointer-events:none; }
+.nova-notice { display:flex; align-items:flex-start; gap:.8rem; padding:.9rem 1rem; border:1px solid var(--glass-border-bright); border-left:4px solid var(--accent-cyan); border-radius:12px; background:#10243a; color:#f4f8ff; box-shadow:0 12px 34px rgba(0,0,0,.34); opacity:0; transform:translateY(-8px); transition:opacity .2s ease,transform .2s ease; pointer-events:auto; }
+.nova-notice.is-visible { opacity:1; transform:translateY(0); }
+.nova-notice--success { border-left-color:#34d399; } .nova-notice--warning { border-left-color:#fbbf24; } .nova-notice--error { border-left-color:#fb7185; }
+.nova-notice__message { flex:1; margin:0; color:#f4f8ff; font-size:.9rem; line-height:1.45; }
+.nova-notice__close { border:0; background:transparent; color:#cbd5e1; font-size:1.35rem; line-height:1; cursor:pointer; padding:0 .15rem; }
+.nova-notice__close:focus-visible { outline:2px solid #67e8f9; outline-offset:3px; border-radius:4px; }
+@media (max-width:480px) { .nova-notice-region { left:1rem; right:1rem; width:auto; } }
