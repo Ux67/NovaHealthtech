@@ -563,10 +563,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         NovaAutoCallCoordinator.isAppInForeground = true
-        if (!isAccessibilityServiceEnabled() && !accessibilityDialogShown) {
-            accessibilityDialogShown = true
-            promptToEnableAccessibilityAutoClicker()
-        }
+        // The app does not require Accessibility permission to open the system dialer.
     }
 
     override fun onStop() {
@@ -818,75 +815,32 @@ class MainActivity : AppCompatActivity() {
                enabledServices.contains("NovaAutoCallAccessibilityService", ignoreCase = true)
     }
 
-    @SuppressLint("MissingPermission")
     private fun executeDirectHardwareCall(phoneNumber: String) {
         val now = System.currentTimeMillis()
         if (now - lastAutoCallTimestampMs < 6000L) return
-
         val cleanNumber = phoneNumber.replace(Regex("[^0-9+]"), "")
         if (cleanNumber.isEmpty() || cleanNumber == "108") {
             showConfigureEmergencyContactPrompt()
             return
         }
-
-        val uri = Uri.fromParts("tel", cleanNumber, null)
-
-        val hasCallPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CALL_PHONE
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (!hasCallPermission) {
-            pendingAutoCallNumber = cleanNumber
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE),
-                CALL_PERMISSION_ONLY_REQ_CODE
-            )
-            return
-        }
-
         lastAutoCallTimestampMs = now
-        NovaAutoCallCoordinator.targetNumber = cleanNumber
-        NovaAutoCallCoordinator.autoCallRequestedAtMs = now
-        NovaAutoCallCoordinator.scheduleImmediateDialerTap()
-
-        val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-        var primaryPhoneAccount = try {
-            telecomManager.getDefaultOutgoingPhoneAccount("tel")
+        val dialIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null))
+        try {
+            AlertDialog.Builder(this)
+                .setTitle("Emergency call ready")
+                .setMessage("Nova Healthtech is ready to open the phone dialer for your saved emergency contact. Review the number and tap Call in the phone app to place the call.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Open dialer") { _, _ ->
+                    try { startActivity(dialIntent) } catch (_: Exception) {
+                        Toast.makeText(this, "Unable to open the phone dialer on this device.", Toast.LENGTH_LONG).show()
+                    }
+                }
+                .show()
         } catch (_: Exception) {
-            null
-        }
-        if (primaryPhoneAccount == null) {
-            try {
-                val accounts = telecomManager.callCapablePhoneAccounts
-                if (accounts.isNotEmpty()) {
-                    primaryPhoneAccount = accounts[0]
-                }
-            } catch (_: Exception) {}
-        }
-
-        try {
-            val directCallIntent = Intent(Intent.ACTION_CALL, uri).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                putExtra(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
-                if (primaryPhoneAccount != null) {
-                    putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, primaryPhoneAccount)
-                }
+            try { startActivity(dialIntent) } catch (_: Exception) {
+                Toast.makeText(this, "Unable to open the phone dialer on this device.", Toast.LENGTH_LONG).show()
             }
-            startActivity(directCallIntent)
-            return
-        } catch (_: Exception) {}
-
-        try {
-            val extras = Bundle().apply {
-                putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
-                if (primaryPhoneAccount != null) {
-                    putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, primaryPhoneAccount)
-                }
-            }
-            telecomManager.placeCall(uri, extras)
-        } catch (_: Exception) {}
+        }
     }
 
     private fun checkPermissionsAndStartServiceSafely() {
