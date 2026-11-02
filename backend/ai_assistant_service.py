@@ -1632,14 +1632,18 @@ class AIAssistantService:
             if lang_code != "en"
             else english_reply
         )
+        key_ready = bool(self.get_api_key())
         return {
             "source": "nova_ai_conversational",
-            "model": "AI Online • Live Web Search",
-            "api_connected": True,
+            "model": "AI Online • Medical Companion" if key_ready else "Medical AI offline • API key required",
+            "api_connected": key_ready,
             "language": lang_code,
             "reply": strip_latex_artifacts(final_reply),
             "english_reply": english_reply,
-            "safety_disclaimer": "🟢 AI Online • Verified Clinical & Drug Reference",
+            "safety_disclaimer": (
+                "Medical information • Educational only"
+                if key_ready else "Medical AI is not connected yet. Configure GEMINI_API_KEY in the deployment environment."
+            ),
         }
 
     def _lookup_openfda_medicine(self, med_query: str) -> Optional[Dict[str, Any]]:
