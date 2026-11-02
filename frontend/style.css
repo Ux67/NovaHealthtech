@@ -1533,3 +1533,12 @@ textarea::placeholder {
   color: #64748B;
   opacity: 1;
 }
+
+/* Preserve dark text inside intentionally light assistant message cards. */
+.chat-bubble,
+.chat-bubble p,
+.chat-bubble li,
+.chat-bubble strong {
+  color: #1E293B !important;
+  -webkit-text-fill-color: #1E293B !important;
+}
