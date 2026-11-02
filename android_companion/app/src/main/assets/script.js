@@ -2396,10 +2396,10 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                     if (!savedNum) {
                         data.incident.direct_call_placed = false;
                         data.incident.dispatch_status_message = "⚠️ Auto-Call Not Placed: No emergency contact configured. Please save an emergency contact phone number in the SOS setting above.";
-                    } else if (!bodyObj.is_simulation) {
-                        data.incident.direct_call_placed = true;
-                        data.incident.dispatch_status_message = "Emergency dialer requested for saved contact (" + savedNum + ").";
-                    }
+                     } else if (!bodyObj.is_simulation) {
+                         data.incident.direct_call_placed = false;
+                         data.incident.dispatch_status_message = "Saved-contact call request is handled by Android; call completion is not confirmed by the website.";
+                     }
                     return new Response(JSON.stringify(data), {
                         status: res.status,
                         headers: { "Content-Type": "application/json" }
