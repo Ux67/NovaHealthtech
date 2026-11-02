@@ -1235,7 +1235,7 @@ function initAssistantChatModule() {
     keyBar.id = "apiKeySetupBar";
     keyBar.className = "ai-status-bar";
     keyBar.innerHTML = `
-      <strong id="apiKeyStatusLabel" class="ai-status-bar__online">🟢 AI is Online</strong>
+      <strong id="apiKeyStatusLabel" class="ai-status-bar__offline">Checking AI service…</strong>
       <span class="ai-status-bar__mode">🟢 AI Online • Live Web Search</span>
     `;
     chatContainer.insertBefore(keyBar, chatContainer.firstChild);
@@ -1344,7 +1344,7 @@ function resetAssistantGreeting() {
     "• **Ask about any Disease, Mental Health Condition or Symptom:** I will give you the **Causes, Symptoms, Diagnostic Tests, Precautions, Doctor/Specialist Recommendations, and Emergency Hospital Helplines**, and ask **where you live** to show hospitals near you!\n" +
     "• **Ask about any Medicine (Brand + `mg` + Specifier):** (e.g., *Lithonex 450 XL, Dolo 650, Zerodol-SP, Pan-D*) for its active salt, uses, when to take it, and safety guidance.\n" +
     "• **Tell me your City or State:** Type your city or state name anytime to see **Participating Hospitals & Nearby Medicine Stores**!";
-  appendChatMessage("assistant", englishGreeting, "🟢 AI Online • Live Web Search", englishGreeting);
+  appendChatMessage("assistant", englishGreeting, "Medical information assistant • status checked by backend", englishGreeting);
 }
 
 function formatRichBubbleContent(bubbleEl, rawText) {
@@ -2165,9 +2165,9 @@ async function runHealthCheck() {
     const aiOnline = backendOnline && data.ai_online === true;
 
     if (aiOnline) {
-      setStatus("🔵 AI is Online", true);
+      setStatus("🔵 AI Provider Configured", true);
     } else if (backendOnline) {
-      setStatus("AI is Offline • Backend Connected", false);
+      setStatus("AI Fallback Mode • Backend Connected", false);
     } else {
       setStatus("Backend Unavailable", false);
     }
