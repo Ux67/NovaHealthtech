@@ -2142,11 +2142,18 @@ async function runHealthCheck() {
     if (statusBadge) statusBadge.className = online
       ? "status-pill status-pill--online"
       : "status-pill status-pill--offline";
-    if (statusText) statusText.textContent = label;
-    if (diagnosticStatus) diagnosticStatus.textContent = label;
+    if (statusText) {
+      statusText.textContent = label;
+      statusText.style.color = online ? "#2563EB" : "";
+    }
+    if (diagnosticStatus) {
+      diagnosticStatus.textContent = label;
+      diagnosticStatus.style.color = online ? "#2563EB" : "";
+    }
     if (assistantStatus) {
       assistantStatus.textContent = label;
       assistantStatus.className = online ? "ai-status-bar__online" : "ai-status-bar__offline";
+      assistantStatus.style.color = online ? "#2563EB" : "";
     }
   };
 
