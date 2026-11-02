@@ -2454,6 +2454,11 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
         const sName = window.__getSavedSosAutoCallName();
         const b = document.getElementById("novaCustomSosStatusBadge");
         const rBtn = document.getElementById("novaCustomSosRemoveBtn");
+        const savedContactAction = document.getElementById("sosDirectCall108");
+        if (savedContactAction) {
+            savedContactAction.textContent = sNum ? ("📞 Call " + sName + " (" + sNum + ")") : "Save SOS Number";
+            savedContactAction.setAttribute("href", sNum ? ("tel:" + sNum) : "javascript:window.__openFeatureScreen('sos')");
+        }
         if (b) {
             b.style.background = sNum ? "rgba(16,185,129,0.22)" : "rgba(244,63,94,0.22)";
             b.style.color = sNum ? "#6ee7b7" : "#fda4af";
