@@ -726,6 +726,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun scheduleMedicationReminder(
+            id: String,
+            medicineName: String,
+            prescribedDose: String,
+            scheduledTime: String,
+            mealRelation: String,
+            notes: String
+        ) {
+            MedicationAlarmScheduler.schedule(
+                this@MainActivity, id, medicineName, prescribedDose, scheduledTime, mealRelation, notes
+            )
+        }
+
+        @JavascriptInterface
+        fun cancelMedicationReminder(id: String) {
+            MedicationAlarmScheduler.cancel(this@MainActivity, id)
+        }
+
+        @JavascriptInterface
         fun savePersistentData(key: String, jsonValue: String) {
             dbHelper.putKv(key, jsonValue)
         }
