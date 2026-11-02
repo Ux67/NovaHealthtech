@@ -46,6 +46,7 @@ class AccidentDetectionService : Service(), SensorEventListener {
         const val KEY_SAVED_SOS_NUMBER = "saved_sos_number"
         const val KEY_SAVED_SOS_NAME = "saved_sos_name"
         const val KEY_BG_AUTO_CALL_ENABLED = "bg_auto_call_when_closed_enabled"
+        const val KEY_LAST_CALL_ATTEMPT_AT_MS = "last_emergency_call_attempt_at_ms"
 
         private const val MONITOR_CHANNEL_ID = "nova_crash_monitor_channel"
         private const val ALERT_CHANNEL_ID = "nova_crash_emergency_alert_channel"
@@ -450,6 +451,11 @@ class AccidentDetectionService : Service(), SensorEventListener {
             showCallPermissionMissingNotification(cleanNumber)
             return
         }
+        val callPrefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        val lastAttempt = callPrefs.getLong(KEY_LAST_CALL_ATTEMPT_AT_MS, 0L)
+        if (now - lastAttempt < 60_000L) return
+        callPrefs.edit().putLong(KEY_LAST_CALL_ATTEMPT_AT_MS, now).apply()
         try {
             val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
             telecomManager.placeCall(
