@@ -1810,9 +1810,16 @@ class MainActivity : AppCompatActivity() {
                         return origFetch(input, init);
                     }
 
-                    if (REMOTE_API && (rawUrl.includes('/api/') || rawUrl.startsWith('api/'))) {
+                    if (rawUrl.includes('/api/') || rawUrl.startsWith('api/')) {
                         let timeoutId = null;
                         try {
+                            if (!REMOTE_API) {
+                                return new Response(JSON.stringify({
+                                    status: "error",
+                                    backend_reachable: false,
+                                    message: "Nova Healthtech backend URL is not configured in this APK."
+                                }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+                            }
                             const parsedUrl = new URL(rawUrl, window.location.href);
                             const apiPath = parsedUrl.pathname + parsedUrl.search;
                             if (!apiPath.startsWith('/api/')) {
