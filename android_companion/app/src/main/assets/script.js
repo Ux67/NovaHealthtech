@@ -2643,8 +2643,9 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                     '  padding: 1.1rem !important;' +
                     '  display: flex !important; flex-direction: column !important; justify-content: space-between !important;' +
                     '}' +
-                    'h1, h2, h3, h4 { color: var(--hc-text) !important; font-weight: 700 !important; letter-spacing: -0.015em !important; margin-top: 0 !important; }' +
-                    'p, li, label, small, .scheme-summary, .scheme-coverage { color: var(--hc-muted) !important; }' +
+                    'h1, h2, h3, h4 { color: #F8FAFC !important; -webkit-text-fill-color: #F8FAFC !important; background: none !important; font-weight: 700 !important; letter-spacing: -0.015em !important; margin-top: 0 !important; }' +
+                    'p, li, label, small, .scheme-summary, .scheme-coverage { color: #DCE6F2 !important; opacity: 1 !important; }' +
+                     'main h1, main h2, main h3, main h4, main p, main li, main label, main small, .glass-panel h1, .glass-panel h2, .glass-panel h3, .glass-panel h4, .glass-panel p, .glass-panel li, .glass-panel label, .tool-box h3, .tool-box p, .tool-box label, .assistant-module h2, .assistant-module h3, .assistant-module p { color: #F1F5F9 !important; -webkit-text-fill-color: #F1F5F9 !important; opacity: 1 !important; }' +
                     '.scheme-badge, .status-pill {' +
                     '  background: #EFF6FF !important; color: var(--hc-blue) !important;' +
                     '  border: 1px solid #BFDBFE !important; border-radius: 6px !important;' +
