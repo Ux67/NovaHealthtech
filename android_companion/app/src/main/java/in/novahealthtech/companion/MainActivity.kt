@@ -523,6 +523,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         NovaAutoCallCoordinator.isAppInForeground = true
+        // Re-arm locally saved medication alarms after returning from Android settings.
+        MedicationAlarmScheduler.restoreAll(this)
         // The app does not require Accessibility permission to open the system dialer.
     }
 
@@ -699,6 +701,7 @@ class MainActivity : AppCompatActivity() {
             MedicationAlarmScheduler.schedule(
                 this@MainActivity, id, medicineName, prescribedDose, scheduledTime, mealRelation, notes
             )
+            runOnUiThread { requestExactAlarmPermissionIfNeeded() }
         }
 
         @JavascriptInterface
@@ -770,6 +773,21 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null)))
         } catch (_: Exception) {
             Toast.makeText(this, "Unable to open the phone dialer. Please use your phone's calling app.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun requestExactAlarmPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+        try {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+            if (alarmManager.canScheduleExactAlarms()) return
+            val requestIntent = Intent(
+                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                Uri.parse("package:$packageName")
+            )
+            startActivity(requestIntent)
+        } catch (_: Exception) {
+            // The scheduler retains its inexact-alarm fallback if Android does not expose this setting.
         }
     }
 
