@@ -9,6 +9,41 @@
  *   with verified clickable tel: call buttons and Google Maps directions links
  */
 
+/** Accessible non-blocking notice UI. */
+function showNotice(message, type = "info") {
+  const text = String(message || "").trim();
+  if (!text) return;
+  let region = document.getElementById("novaNoticeRegion");
+  if (!region) {
+    region = document.createElement("div");
+    region.id = "novaNoticeRegion";
+    region.className = "nova-notice-region";
+    region.setAttribute("role", "region");
+    region.setAttribute("aria-label", "Notifications");
+    region.setAttribute("aria-live", "polite");
+    document.body.appendChild(region);
+  }
+  const notice = document.createElement("div");
+  const safeType = ["success", "warning", "error"].includes(type) ? type : "info";
+  notice.className = "nova-notice nova-notice--" + safeType;
+  notice.setAttribute("role", type === "error" ? "alert" : "status");
+  const messageNode = document.createElement("p");
+  messageNode.className = "nova-notice__message";
+  messageNode.textContent = text;
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "nova-notice__close";
+  close.setAttribute("aria-label", "Dismiss notification");
+  close.textContent = "×";
+  close.addEventListener("click", () => notice.remove());
+  notice.append(messageNode, close);
+  region.appendChild(notice);
+  window.setTimeout(() => notice.classList.add("is-visible"), 10);
+  window.setTimeout(() => {
+    notice.classList.remove("is-visible");
+    window.setTimeout(() => notice.remove(), 220);
+  }, 6500);
+}
 const API_BASE_URL = window.location.port === "5500" ? "http://127.0.0.1:5000" : "";
 const LANG_STORAGE_KEY = "nova_preferred_lang";
 
@@ -198,66 +233,26 @@ function initLowBandwidthMode() {
 function initLanguageSelectorAndBar() {
   const langSelect = document.getElementById("langSelect");
   const consultLang = document.getElementById("consultLang");
-
+  const populateLanguageSelect = (select) => {
+    if (!select) return;
+    const previousValue = select.value;
+    select.replaceChildren();
+    LANGUAGES_LIST.forEach((language) => {
+      const option = document.createElement("option");
+      option.value = language.code;
+      option.textContent = language.nativeName + " (" + language.englishName + ")";
+      select.appendChild(option);
+    });
+    select.value = LANG_META[previousValue] ? previousValue : currentLang;
+  };
+  populateLanguageSelect(langSelect);
+  populateLanguageSelect(consultLang);
   if (langSelect) {
-    langSelect.replaceChildren();
-    LANGUAGES_LIST.forEach((l, idx) => {
-      const opt = document.createElement("option");
-      opt.value = l.code;
-      const numStr = convertDigitsToNative(String(idx + 1), l.code);
-      opt.textContent = `${numStr}. ${l.nativeName} (${l.englishName})`;
-      langSelect.appendChild(opt);
-    });
     langSelect.value = currentLang;
-    langSelect.addEventListener("change", (e) => setLanguage(e.target.value));
+    langSelect.addEventListener("change", (event) => setLanguage(event.target.value));
   }
-
-  if (consultLang) {
-    consultLang.replaceChildren();
-    LANGUAGES_LIST.forEach((l, idx) => {
-      const opt = document.createElement("option");
-      opt.value = l.code;
-      const numStr = convertDigitsToNative(String(idx + 1), l.code);
-      opt.textContent = `${numStr}. ${l.nativeName} (${l.englishName})`;
-      consultLang.appendChild(opt);
-    });
-    consultLang.value = currentLang;
-  }
-
-  const mainContent = document.querySelector(".main-content");
-  if (mainContent && !document.getElementById("languagePillBar")) {
-    const barWrapper = document.createElement("section");
-    barWrapper.id = "languagePillBar";
-    barWrapper.className = "glass-panel lang-selector-panel";
-
-    const barHeader = document.createElement("div");
-    barHeader.className = "lang-selector-header";
-    barHeader.innerHTML = `
-      <strong class="lang-selector-title">🌐 Select Your Language (22 Languages):</strong>
-      <span id="activeLangIndicator" class="lang-selector-active">English</span>
-    `;
-
-    const pillsContainer = document.createElement("div");
-    pillsContainer.id = "langPillsContainer";
-    pillsContainer.className = "lang-pills-grid";
-
-    LANGUAGES_LIST.forEach((l, idx) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.dataset.langCode = l.code;
-      btn.className = "lang-pill-btn";
-      const nativeNum = convertDigitsToNative(String(idx + 1), l.code);
-      btn.textContent = `${nativeNum}. ${l.nativeName}`;
-      btn.title = `${l.nativeName} (${l.englishName})`;
-      btn.addEventListener("click", () => setLanguage(l.code));
-      pillsContainer.appendChild(btn);
-    });
-
-    barWrapper.append(barHeader, pillsContainer);
-    mainContent.insertBefore(barWrapper, mainContent.firstChild);
-    stampEnglishBaseline(barHeader);
-  }
-
+  if (consultLang) consultLang.value = currentLang;
+  // Keep the 22-language selector compact. Do not inject a second full-page button grid.
   updateLanguagePillsUI(currentLang);
 }
 
@@ -614,7 +609,7 @@ async function initSosAndAccidentDetectionModule() {
         if (currentLang !== "en") await translateWholePageAndChat(currentLang);
       } else {
         const err = await res.json().catch(() => ({}));
-        alert(err.message || "Enter a valid 10-digit mobile number.");
+        showNotice(err.message || "Enter a valid 10-digit mobile number.", "error");
       }
     });
   }
@@ -1548,7 +1543,7 @@ async function initConsultationsModule() {
       await loadRecentConsultations();
       if (currentLang !== "en") await translateWholePageAndChat(currentLang);
     } else {
-      alert("Please enter a valid 10-digit mobile number.");
+      showNotice("Please enter a valid 10-digit mobile number.", "error");
     }
   });
 }
@@ -2378,7 +2373,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                             fb.style.color = "#fda4af";
                             fb.textContent = "⚠️ SOS Auto-Call Paused: No emergency contact number is saved. Please enter and save a valid phone number below.";
                         }
-                        alert("⚠️ No Emergency Contact Configured!\n\nPlease enter and save an emergency contact phone number in the 'Emergency SOS Auto-Call Contact Number' box to enable automatic calling.");
+                        showNotice("⚠️ No Emergency Contact Configured!\n\nPlease enter and save an emergency contact phone number in the 'Emergency SOS Auto-Call Contact Number' box to enable automatic calling.");
                         document.getElementById("novaCustomSosNumInput")?.focus();
                     }
                 }
@@ -2526,7 +2521,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                 const r = await origFetch(input, init);
                 if (!b.is_simulation) {
                     if (sNum) { window.location.href = "tel:" + sNum; }
-                    else { alert("⚠️ No emergency number saved! Please enter and save a phone number in the 'Permanent SOS Auto-Call Number' box."); }
+                    else { showNotice("⚠️ No emergency number saved! Please enter and save a phone number in the 'Permanent SOS Auto-Call Number' box."); }
                 }
                 return r;
             } catch (e) {}
@@ -2950,7 +2945,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                     } else if (saved) {
                         window.location.href = 'tel:' + saved;
                     } else {
-                        alert('No emergency number saved yet! Please enter and save a phone number in the Emergency Auto-Call Number box.');
+                        showNotice('No emergency number saved yet. Add a trusted contact in Emergency Settings.', 'warning');
                     }
                 };
 
@@ -2982,7 +2977,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                             return;
                         }
                     } catch (e) {}
-                    alert("Opens Android System Accessibility Settings > Emergency Auto-Caller.");
+                    showNotice("Open Android Settings, then Accessibility, and review Emergency Auto-Caller permissions.", "info");
                 };
 
                 function getChatSessions() {
