@@ -1,4 +1,0 @@
-in.novahealthtech.companion.test.app-androidTest-0 C:\Users\HP\NovaHealthtech\android_companion\app\build\generated\res\resValues\androidTest\debug
-in.novahealthtech.companion.test.app-mergeDebugAndroidTestResources-1 C:\Users\HP\NovaHealthtech\android_companion\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
-in.novahealthtech.companion.test.app-mergeDebugAndroidTestResources-2 C:\Users\HP\NovaHealthtech\android_companion\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
-in.novahealthtech.companion.test.app-debugAndroidTest-3 C:\Users\HP\NovaHealthtech\android_companion\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
