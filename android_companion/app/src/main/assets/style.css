@@ -1534,5 +1534,14 @@ textarea::placeholder {
   opacity: 1;
 }
 
+/* Preserve dark text inside intentionally light assistant message cards. */
+.chat-bubble,
+.chat-bubble p,
+.chat-bubble li,
+.chat-bubble strong {
+  color: #1E293B !important;
+  -webkit-text-fill-color: #1E293B !important;
+}
+
 /* Light assistant chat bubbles retain their dark, high-contrast typography. */
 .chat-bubble, .chat-bubble p, .chat-bubble li, .chat-bubble strong { color: #1E293B !important; -webkit-text-fill-color: #1E293B !important; }
