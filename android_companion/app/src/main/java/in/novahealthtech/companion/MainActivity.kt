@@ -168,7 +168,7 @@ class NovaAutoCallAccessibilityService : AccessibilityService() {
 
         Toast.makeText(
             applicationContext,
-            "Emergency Auto-Caller is ON",
+            "Background accident monitoring is active",
             Toast.LENGTH_LONG
         ).show()
     }
@@ -424,13 +424,13 @@ class MainActivity : AppCompatActivity() {
     private fun showConfigureEmergencyContactPrompt() {
         Toast.makeText(
             this,
-            "Please save an Emergency Auto-Call Number in the SOS section first.",
+            "Please save a trusted emergency contact in the SOS section first.",
             Toast.LENGTH_LONG
         ).show()
         try {
             AlertDialog.Builder(this)
-                .setTitle("Save Emergency Auto-Call Number")
-                .setMessage("No emergency phone number is saved in the database yet.\n\nEnter the mobile number you want to call in the 'Emergency Auto-Call Number' box and tap Save Number.")
+                .setTitle("Save Emergency Contact")
+                .setMessage("No emergency phone number is saved yet.\n\nEnter a trusted contact in the SOS section and tap Save Number.")
                 .setPositiveButton("Go to SOS Setting") { _, _ ->
                     webView.evaluateJavascript(
                         "(function(){ if(window.__openFeatureScreen) window.__openFeatureScreen('sos'); var el = document.getElementById('novaDbSosNumInput'); if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus(); } })();",
@@ -731,7 +731,7 @@ class MainActivity : AppCompatActivity() {
                 val stateLabel = if (enabled) "ON (Active when app is closed)" else "OFF (Paused when app is closed)"
                 Toast.makeText(
                     this@MainActivity,
-                    "Background Auto-Calling: $stateLabel",
+                    "Background Accident Monitoring: $stateLabel",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -2430,7 +2430,7 @@ class MainActivity : AppCompatActivity() {
                             '<div id="novaAuthLoggedInView" style="display:none;">' +
                                 '<h3 style="margin-bottom:0.35rem;">Signed In Permanently</h3>' +
                                 '<p id="novaLoggedInUserName" style="color:#0F766E !important; font-weight:700; font-size:0.95rem; margin-bottom:0.85rem;"></p>' +
-                                '<p style="font-size:0.84rem; margin-bottom:1.2rem;">Your Emergency Auto-Call Number, AI Conversation Memory, and Medicine Reminders are permanently synced to your account.</p>' +
+                                '<p style="font-size:0.84rem; margin-bottom:1.2rem;">Your Saved Emergency Contact, AI Conversation Memory, and Medicine Reminders are permanently synced to your account.</p>' +
                                 '<div style="display:flex; gap:0.6rem;">' +
                                     '<button type="button" onclick="window.__closeLoginDashboardScreen()" style="flex:1;">Return to App</button>' +
                                     '<button type="button" onclick="window.__handleNovaLogout()" style="background:#DC2626 !important; color:#FFFFFF !important;">Sign Out</button>' +
@@ -2470,11 +2470,11 @@ class MainActivity : AppCompatActivity() {
                     sosCard.style.cssText = "margin: 0.9rem 0; padding: 1rem; border-radius: 10px; background: #F8FAFC; border: 1px solid #CBD5E1;";
                     sosCard.innerHTML =
                         '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.4rem;">' +
-                            '<strong style="color:#0F172A; font-size:0.9rem;">📌 Emergency Auto-Call Number (Database)</strong>' +
+                            '<strong style="color:#0F172A; font-size:0.9rem;">📌 Saved Emergency Contact (Database)</strong>' +
                             '<span id="novaDbSosBadge" style="font-size:0.78rem; font-weight:700;"></span>' +
                         '</div>' +
                         '<p id="novaDbSosFeedback" style="font-size:0.8rem; color:#475569; margin:0 0 0.65rem 0;">' +
-                            'Save anyone\'s mobile number permanently below. When SOS is triggered, Emergency Auto-Caller dials ONLY this saved number.' +
+                            'Save a trusted contact below. When SOS is triggered, Nova opens only this saved contact in the phone dialer for you to confirm.' +
                         '</p>' +
                         '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.55rem; margin-bottom:0.65rem;">' +
                             '<input id="novaDbSosNameInput" type="text" placeholder="Contact Name (e.g. Mom)" />' +
@@ -2514,9 +2514,9 @@ class MainActivity : AppCompatActivity() {
                     accSec.id = "novaStandaloneAccessibilityScreen";
                     accSec.innerHTML =
                         '<h2>⚙️ Accessibility &amp; Background Auto-Calling</h2>' +
-                        '<p style="margin-bottom:0.8rem;">Control whether Emergency Auto-Caller continues monitoring severe ground impacts and placing automatic calls to your saved contact after the app is closed.</p>' +
+                        '<p style="margin-bottom:0.8rem;">Control whether accident monitoring continues after the app is closed. A countdown alert will appear; you can open the saved contact in the phone dialer and confirm the call.</p>' +
                         '<div style="padding:0.95rem; border-radius:10px; background:#F8FAFC; border:1px solid #E2E8F0;">' +
-                            '<div style="font-size:0.78rem; color:#64748B; margin-bottom:0.2rem;">Background Auto-Call Status:</div>' +
+                            '<div style="font-size:0.78rem; color:#64748B; margin-bottom:0.2rem;">Background Accident Monitoring Status:</div>' +
                             '<div id="novaBgAutoCallStatusBadge" style="font-weight:700; font-size:0.9rem; margin-bottom:0.8rem;"></div>' +
                             '<div style="display:grid; grid-template-columns:1fr; gap:0.5rem;">' +
                                 '<button id="novaBgAutoCallToggleBtn" type="button" onclick="window.__toggleBackgroundAutoCallSetting()"></button>' +
