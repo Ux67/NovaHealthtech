@@ -157,6 +157,9 @@ class AccidentDetectionService : Service(), SensorEventListener {
                     targetNumber,
                     getSavedEmergencyName()
                 )
+                // Countdown expired and the user did not cancel. Place the opted-in call
+                // through Android Telecom, without opening or tapping another dialer app.
+                executeBackgroundEmergencyCall(targetNumber, candidateImpactPeakMs2)
                 return
             }
             showHighPriorityCountdownNotification(
@@ -441,28 +444,53 @@ class AccidentDetectionService : Service(), SensorEventListener {
             return
         }
 
-        // Invoked only after the user taps the notification action.
-        // ACTION_DIAL opens the system dialer; the user reviews and places the call.
-        val dialIntent = Intent(
-            Intent.ACTION_DIAL,
-            Uri.fromParts("tel", cleanNumber, null)
-        ).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // This function runs after the 8-second countdown, or from the explicit Call action.
+        // CALL_PHONE permission is requested in MainActivity during setup.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            showCallPermissionMissingNotification(cleanNumber)
+            return
         }
         try {
-            startActivity(dialIntent)
+            val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            telecomManager.placeCall(
+                Uri.fromParts("tel", cleanNumber, null),
+                Bundle().apply {
+                    putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
+                }
+            )
+            return
         } catch (_: Exception) {
-            val fallbackUi = Intent(this, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                putExtra("CRASH_DETECTED", true)
-                putExtra("PEAK_ACCEL", peakAccelMs2)
-            }
-            try {
-                startActivity(fallbackUi)
-            } catch (_: Exception) {
-                Toast.makeText(applicationContext, "Unable to open the phone dialer. Use your phone's emergency calling feature.", Toast.LENGTH_LONG).show()
-            }
+            // If Android's Telecom API is unavailable, try its native call intent.
         }
+        try {
+            val callIntent = Intent(Intent.ACTION_CALL, Uri.fromParts("tel", cleanNumber, null)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(callIntent)
+        } catch (_: Exception) {
+            showCallPermissionMissingNotification(cleanNumber)
+        }
+    }
+
+    private fun showCallPermissionMissingNotification(number: String) {
+        val dialIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", number, null)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        val pi = PendingIntent.getActivity(
+            this, 204, dialIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notice = NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_warning)
+            .setContentTitle("Automatic emergency call unavailable")
+            .setContentText("Call permission is missing. Open the dialer to contact your saved emergency contact.")
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+            .build()
+        nm.notify(ALERT_NOTIF_ID + 1, notice)
     }
 
     private fun acquireTemporaryWakeLock() {
@@ -534,7 +562,7 @@ class AccidentDetectionService : Service(), SensorEventListener {
                 "Nova Critical SOS Countdown Alerts",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Emergency countdown with a user-controlled dialer action."
+                description = "Emergency countdown with automatic calling when enabled and permitted."
                 enableVibration(true)
                 setSound(alarmSound, audioAttrs)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -618,16 +646,16 @@ class AccidentDetectionService : Service(), SensorEventListener {
         val peakFormatted = String.format("%.1f", peakMs2)
         val hasTarget = targetNum.isNotEmpty()
         val titleText = if (hasTarget) {
-            "POTENTIAL EMERGENCY ($peakFormatted m/s²) — REVIEW CALL"
+            "POTENTIAL EMERGENCY ($peakFormatted m/s²) — AUTO-CALL COUNTDOWN"
         } else {
             "SEVERE IMPACT ($peakFormatted m/s²) — NO SOS CONTACT SAVED"
         }
         val bodyText = if (hasTarget) {
-            (if (secondsLeft > 0) "Possible severe impact. Review the alert. $secondsLeft seconds remaining; tap CANCEL if safe." else "Emergency alert active. Tap OPEN DIALER to review the saved contact and place a call.")
+            (if (secondsLeft > 0) "Possible severe impact. Review the alert. $secondsLeft seconds remaining; tap CANCEL if safe." else "Countdown complete. Nova is attempting to call your saved emergency contact.")
         } else {
             "No emergency contact configured (${secondsLeft}s). Tap to configure contact."
         }
-        val callBtnLabel = if (hasTarget) "OPEN DIALER" else "CONFIGURE CONTACT"
+        val callBtnLabel = if (hasTarget) "CALL NOW" else "CONFIGURE CONTACT"
 
         val alertNotif = NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_warning)
