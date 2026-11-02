@@ -991,8 +991,8 @@ function startIncidentCountdownWorkflow(triggerSource, sensorPayload) {
   if (headline) {
     headline.textContent =
       triggerSource === "manual_sos_button"
-        ? "🚨 MANUAL SOS — AUTO-CALLING AMBULANCE (108) & SHARING LOCATION"
-        : "🚨 IMPACT DETECTED — AUTO-CALLING AMBULANCE (108) IN 8 SECONDS!";
+        ? "🚨 MANUAL SOS — REVIEW EMERGENCY CALL & SHARE LOCATION"
+        : "🚨 IMPACT DETECTED — REVIEW SOS ALERT";
     if (headline.firstChild) headline.firstChild._origEn = headline.textContent;
   }
   if (details) {
@@ -1128,7 +1128,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
     }
 
     speakAssistantResponse(
-      `Emergency SOS countdown complete. Automatically calling 108 Ambulance and sharing location ${locDescription}.`,
+      `Emergency SOS countdown complete. Open the phone dialer to review the emergency number and share location ${locDescription}.`,
       currentLang
     );
 
@@ -1172,7 +1172,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
   } catch (err) {
     if (reportBox) {
       reportBox.hidden = false;
-      reportBox.innerHTML = `<p><strong>🚨 8s Countdown Complete (Offline Mode):</strong> Automatically calling <strong>108 (Ambulance)</strong> now!</p>`;
+      reportBox.innerHTML = `<p><strong>🚨 8s Countdown Complete (Offline Mode):</strong> Review the emergency number in your phone dialer and tap Call.</p>`;
       stampEnglishBaseline(reportBox);
     }
     if (!isSim) {
@@ -2384,7 +2384,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                         data.incident.dispatch_status_message = "⚠️ Auto-Call Not Placed: No emergency contact configured. Please save an emergency contact phone number in the SOS setting above.";
                     } else if (!bodyObj.is_simulation) {
                         data.incident.direct_call_placed = true;
-                        data.incident.dispatch_status_message = "Direct emergency auto-call initiated to saved contact (" + savedNum + ").";
+                        data.incident.dispatch_status_message = "Emergency dialer requested for saved contact (" + savedNum + ").";
                     }
                     return new Response(JSON.stringify(data), {
                         status: res.status,
@@ -2917,7 +2917,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                             window.NovaAndroidBridge.savePermanentEmergencyContact(nameVal, numVal);
                         }
                     } catch (e) {}
-                    if (fb) { fb.style.color = '#0F766E'; fb.textContent = 'Saved in Database! SOS will automatically call ' + nameVal + ' (' + numVal + ').'; }
+                    if (fb) { fb.style.color = '#0F766E'; fb.textContent = 'Saved in database. SOS can prompt you to open the dialer for ' + nameVal + ' (' + numVal + ').'; }
                     window.__syncAppHeaderAndAuthUi();
                 };
 
@@ -2971,13 +2971,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                 };
 
                 window.__openNativeAccessibilitySettings = function() {
-                    try {
-                        if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.openAccessibilitySettings === 'function') {
-                            window.NovaAndroidBridge.openAccessibilitySettings();
-                            return;
-                        }
-                    } catch (e) {}
-                    showNotice("Open Android Settings, then Accessibility, and review Emergency Auto-Caller permissions.", "info");
+                    showNotice("Emergency calls are user-confirmed. The app does not use Accessibility screen-tapping to place calls.", "info");
                 };
 
                 function getChatSessions() {
@@ -4032,8 +4026,8 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                 const bgBadge = document.getElementById("novaBgAutoCallStatusBadge");
                 if (bgBadge) {
                     bgBadge.textContent = bgEnabled
-                        ? "ON — Auto-Calling continues in background when app is closed"
-                        : "OFF — Auto-Calling stops when app is closed";
+                        ? "ON — Impact monitoring continues when the app is closed"
+                        : "OFF — Impact monitoring pauses when the app is closed";
                     bgBadge.style.color = bgEnabled ? "#0F766E" : "#DC2626";
                 }
 
