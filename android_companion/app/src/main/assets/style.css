@@ -1460,3 +1460,83 @@ body.low-bandwidth .glass-panel {
 .nova-notice__close { border:0; background:transparent; color:#cbd5e1; font-size:1.35rem; line-height:1; cursor:pointer; padding:0 .15rem; }
 .nova-notice__close:focus-visible { outline:2px solid #67e8f9; outline-offset:3px; border-radius:4px; }
 @media (max-width:480px) { .nova-notice-region { left:1rem; right:1rem; width:auto; } }
+
+
+/* ============================================================================
+   ACCESSIBLE PROFESSIONAL CONTRAST OVERRIDES
+   Keep dark medical surfaces, but make every heading and paragraph readable.
+   ============================================================================ */
+:root {
+  --text-primary: #F8FAFC;
+  --text-secondary: #E2E8F0;
+  --text-muted: #CBD5E1;
+  --accent-cyan: #67D5F5;
+  --accent-teal: #55D6BE;
+}
+main h1,
+main h2,
+main h3,
+main h4,
+main h5,
+main h6,
+.glass-panel h1,
+.glass-panel h2,
+.glass-panel h3,
+.glass-panel h4,
+.glass-panel h5,
+.glass-panel h6,
+.tool-box h1,
+.tool-box h2,
+.tool-box h3,
+.tool-box h4,
+.assistant-module h1,
+.assistant-module h2,
+.assistant-module h3,
+.assistant-module h4 {
+  color: #F8FAFC !important;
+  -webkit-text-fill-color: #F8FAFC !important;
+  background: none !important;
+  opacity: 1 !important;
+}
+main p,
+main li,
+main label,
+.glass-panel p,
+.glass-panel li,
+.glass-panel label,
+.tool-box p,
+.tool-box li,
+.tool-box label,
+.assistant-module p,
+.assistant-module li,
+.assistant-module label,
+.text-muted,
+.small-note {
+  color: #DCE6F2 !important;
+  opacity: 1 !important;
+}
+main strong,
+.glass-panel strong,
+.tool-box strong,
+.assistant-module strong {
+  color: #F8FAFC;
+}
+.glass-panel,
+.tool-box,
+.assistant-module,
+.triage-module {
+  color: #F1F5F9;
+}
+.control-input,
+.control-select,
+input,
+textarea,
+select {
+  color: #172033;
+}
+.control-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: #64748B;
+  opacity: 1;
+}
