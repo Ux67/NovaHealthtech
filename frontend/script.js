@@ -2131,9 +2131,12 @@ function initRuralStressTester() {
     const output = document.getElementById("stressTerminalOutput");
     terminal.hidden = false;
     output.textContent = "Testing 2G latency & 22-language endpoints...\n";
-    const res = await fetch(`${API_BASE_URL}/api/health`);
+    const res = await fetch(`${API_BASE_URL}/api/health`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Backend returned HTTP ${res.status}`);
     const data = await res.json();
-    output.textContent += `[PASS] Status: ${data.status} | 22 Languages Active | All 36 States & UTs Active`;
+    const languageCount = Number(data.supported_languages_count || 0);
+    const stateCount = Number(data.states_and_uts_count || 0);
+    output.textContent += `[PASS] Backend: ${data.status} | AI: ${data.ai_online ? "Online" : "Offline"} | Languages: ${languageCount} | States/UTs: ${stateCount}`;
     stampEnglishBaseline(terminal);
     if (currentLang !== "en") await translateWholePageAndChat(currentLang);
   });
@@ -2141,12 +2144,39 @@ function initRuralStressTester() {
 
 async function runHealthCheck() {
   const statusBadge = document.getElementById("statusBadge");
+  const statusText = document.getElementById("statusText");
+  const diagnosticStatus = document.getElementById("diagStatus");
+  const assistantStatus = document.getElementById("apiKeyStatusLabel");
+
+  const setStatus = (label, online) => {
+    if (statusBadge) statusBadge.className = online
+      ? "status-pill status-pill--online"
+      : "status-pill status-pill--offline";
+    if (statusText) statusText.textContent = label;
+    if (diagnosticStatus) diagnosticStatus.textContent = label;
+    if (assistantStatus) {
+      assistantStatus.textContent = label;
+      assistantStatus.className = online ? "ai-status-bar__online" : "ai-status-bar__offline";
+    }
+  };
+
   try {
     const res = await fetch(`${API_BASE_URL}/api/health`, { cache: "no-store" });
-    await res.json();
-    if (statusBadge) statusBadge.className = "status-pill status-pill--online";
+    if (!res.ok) throw new Error(`Health endpoint returned HTTP ${res.status}`);
+    const data = await res.json();
+    const backendOnline = data.status === "ok" && data.backend_reachable === true;
+    const aiOnline = backendOnline && data.ai_online === true;
+
+    if (aiOnline) {
+      setStatus("🔵 AI is Online", true);
+    } else if (backendOnline) {
+      setStatus("AI is Offline • Backend Connected", false);
+    } else {
+      setStatus("Backend Unavailable", false);
+    }
   } catch (err) {
-    if (statusBadge) statusBadge.className = "status-pill status-pill--offline";
+    setStatus("Backend Unavailable", false);
+    console.warn("Nova Healthtech health check failed:", err);
   }
 }
 
