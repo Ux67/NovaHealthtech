@@ -692,17 +692,14 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun placeDirectCall(phoneNumber: String) {
             runOnUiThread {
-                val cleanReq = phoneNumber.replace(Regex("[^0-9+]"), "")
-                val finalNumber = if (cleanReq.isEmpty() || cleanReq == "108") {
-                    getSavedPermanentSosNumber()
-                } else {
-                    cleanReq
-                }
-                if (finalNumber.isEmpty()) {
+                // Automatic SOS calls may only use the currently saved emergency contact.
+                // Ignore any number supplied by legacy JavaScript call paths.
+                val savedNumber = getSavedPermanentSosNumber()
+                if (savedNumber.isEmpty()) {
                     showConfigureEmergencyContactPrompt()
                     return@runOnUiThread
                 }
-                executeDirectHardwareCall(finalNumber)
+                executeDirectHardwareCall(savedNumber)
             }
         }
 
