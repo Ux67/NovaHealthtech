@@ -1473,7 +1473,7 @@ class AIAssistantService:
 
         return {
             "source": "nova_ai_location_directory",
-            "model": "AI Online • Live Web Search",
+            "model": "AI Online • Medical Companion",
             "api_connected": True,
             "language": lang_code,
             "reply": strip_latex_artifacts(final_reply),
@@ -1876,7 +1876,7 @@ class AIAssistantService:
                 final_reply = translate_multiline_response(english_reply, target_lang=lang_code) if lang_code != "en" else english_reply
                 return {
                     "source": "nova_ai_medicine_guide",
-                    "model": "AI Online • Live Web Search",
+                    "model": "AI Online • Medical Companion",
                     "api_connected": True,
                     "language": lang_code,
                     "reply": strip_latex_artifacts(final_reply),
@@ -1938,7 +1938,7 @@ class AIAssistantService:
 
         return {
             "source": "nova_ai_medicine_guide",
-            "model": "AI Online • Live Web Search",
+            "model": "AI Online • Medical Companion",
             "api_connected": True,
             "language": lang_code,
             "reply": strip_latex_artifacts(final_reply),
@@ -2014,7 +2014,7 @@ class AIAssistantService:
 
         return {
             "source": "nova_ai_medicine_for_cause",
-            "model": "AI Online • Live Web Search",
+            "model": "AI Online • Medical Companion",
             "api_connected": True,
             "language": lang_code,
             "reply": strip_latex_artifacts(final_reply),
@@ -2152,7 +2152,7 @@ class AIAssistantService:
                 final_reply = translate_multiline_response(english_reply, target_lang=lang_code) if lang_code != "en" else english_reply
                 return {
                     "source": "nova_ai_disease_guide",
-                    "model": "AI Online • Live Web Search",
+                    "model": "AI Online • Medical Companion",
                     "api_connected": True,
                     "language": lang_code,
                     "reply": strip_latex_artifacts(final_reply),
@@ -2247,7 +2247,7 @@ class AIAssistantService:
 
         return {
             "source": "nova_ai_disease_guide",
-            "model": "AI Online • Live Web Search",
+            "model": "AI Online • Medical Companion",
             "api_connected": True,
             "language": lang_code,
             "reply": strip_latex_artifacts(final_reply),
