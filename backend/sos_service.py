@@ -228,12 +228,12 @@ def create_or_update_sos_incident(
                     dispatch_msg = "Location packet transmitted; calling is handled by the native Android app."
         except Exception as e:
             dispatch_msg = f"Location packet recorded locally ({str(e)[:45]}); native Android calling was not confirmed."
-        inc_status = "DISPATCH_CONFIRMED" if dispatch_confirmed else "AUTO_CALL_INITIATED"
+        inc_status = "DISPATCH_CONFIRMED" if dispatch_confirmed else "INCIDENT_RECORDED"
     else:
         dispatch_msg = (
             "GPS location packet recorded. Native Android is responsible for calling the saved contact after countdown."
         )
-        inc_status = "AUTO_CALL_INITIATED"
+        inc_status = "INCIDENT_RECORDED"
 
     # The backend only records the incident and location. Native Android owns calling.
     # Never place calls from the server or substitute a default telephone number.
