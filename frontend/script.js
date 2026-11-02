@@ -2126,7 +2126,7 @@ function initRuralStressTester() {
     const data = await res.json();
     const languageCount = Number(data.supported_languages_count || 0);
     const stateCount = Number(data.states_and_uts_count || 0);
-    output.textContent += `[PASS] Backend: ${data.status} | AI: ${data.ai_online ? "Online" : "Offline"} | Languages: ${languageCount} | States/UTs: ${stateCount}`;
+    output.textContent += `[PASS] Backend: ${data.status} | AI Provider: ${data.ai_provider_configured ? "Configured" : "Not configured"} | Languages: ${languageCount} | States/UTs: ${stateCount}`;
     stampEnglishBaseline(terminal);
     if (currentLang !== "en") await translateWholePageAndChat(currentLang);
   });
