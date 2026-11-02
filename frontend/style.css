@@ -1545,3 +1545,110 @@ textarea::placeholder {
 
 /* Light assistant chat bubbles retain their dark, high-contrast typography. */
 .chat-bubble, .chat-bubble p, .chat-bubble li, .chat-bubble strong { color: #1E293B !important; -webkit-text-fill-color: #1E293B !important; }
+
+/* FINAL ACCESSIBLE CLINICAL DAYLIGHT THEME */
+:root {
+  color-scheme: light;
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --bg-navy-deep: #F4F6F9;
+  --bg-navy-secondary: #EEF2F7;
+  --bg-navy-elevated: #FFFFFF;
+  --glass-surface-1: #FFFFFF;
+  --glass-surface-2: #F8FAFC;
+  --glass-border-subtle: #DCE4EE;
+  --glass-border-bright: #CBD5E1;
+  --glass-input-bg: #FFFFFF;
+  --shadow-ambient: 0 8px 24px rgba(15,23,42,.06);
+  --shadow-card: 0 3px 12px rgba(15,23,42,.05);
+}
+html, body {
+  color-scheme: light !important;
+  background: #F4F6F9 !important;
+  background-image: none !important;
+  color: #1E293B !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+main, .main-content { color: #1E293B !important; }
+.glass-panel, .assistant-module, .tool-box, .hero-card,
+.guide-card, .scheme-card, .triage-module, .consult-queue-panel,
+.reminders-display-panel {
+  background: #FFFFFF !important;
+  background-image: none !important;
+  color: #1E293B !important;
+  border: 1px solid #DCE4EE !important;
+  box-shadow: 0 4px 16px rgba(15,23,42,.055) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+h1, h2, h3, h4, h5, h6,
+main h1, main h2, main h3, main h4,
+.glass-panel h1, .glass-panel h2, .glass-panel h3, .glass-panel h4,
+.assistant-module h1, .assistant-module h2, .assistant-module h3,
+.tool-box h1, .tool-box h2, .tool-box h3 {
+  color: #172554 !important;
+  -webkit-text-fill-color: #172554 !important;
+  background: none !important;
+  opacity: 1 !important;
+}
+p, li, label, small, .text-muted, .small-note,
+main p, main li, main label, main small,
+.glass-panel p, .glass-panel li, .glass-panel label,
+.assistant-module p, .assistant-module li, .assistant-module label,
+.tool-box p, .tool-box li, .tool-box label {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  opacity: 1 !important;
+}
+.eyebrow, .section-kicker { color: #075985 !important; }
+.chat-messages, #chatMessages {
+  background: #F8FAFC !important;
+  border: 1px solid #DCE4EE !important;
+}
+.chat-msg--assistant .chat-bubble {
+  background: #FFFFFF !important;
+  color: #1E293B !important;
+  border: 1px solid #D8E1EC !important;
+  box-shadow: 0 2px 10px rgba(15,23,42,.05) !important;
+}
+.chat-msg--assistant .chat-bubble,
+.chat-msg--assistant .chat-bubble strong {
+  -webkit-text-fill-color: #1E293B !important;
+}
+.chat-msg--assistant .chat-bubble strong { color: #1746A2 !important; }
+.chat-msg--user .chat-bubble {
+  background: #E8F0FF !important;
+  color: #173B75 !important;
+  -webkit-text-fill-color: #173B75 !important;
+  border: 1px solid #C7D8F5 !important;
+}
+.chat-msg-meta, .chat-msg-meta span { color: #64748B !important; }
+.control-input, .control-select, input, textarea, select {
+  background: #FFFFFF !important;
+  color: #1E293B !important;
+  border-color: #CBD5E1 !important;
+}
+.control-input::placeholder, input::placeholder, textarea::placeholder {
+  color: #64748B !important;
+  opacity: 1 !important;
+}
+.site-header {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #DCE4EE !important;
+  box-shadow: 0 2px 8px rgba(15,23,42,.05) !important;
+}
+.brand__name { color: #172554 !important; }
+.brand__tag { color: #0F766E !important; }
+.emergency-bar { background: #991B1B !important; }
+.emergency-bar__text { color: #FFFFFF !important; }
+.btn-primary, .btn-outline-small, .btn-chat-send {
+  color: #FFFFFF !important;
+}
+@media (max-width: 640px) {
+  body { font-size: 16px !important; }
+  .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .glass-panel, .assistant-module, .tool-box { padding: 1rem !important; }
+  .chat-bubble { font-size: 1rem !important; line-height: 1.65 !important; }
+}
