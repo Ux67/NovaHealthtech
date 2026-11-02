@@ -2529,8 +2529,13 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                 init.body = JSON.stringify(b);
                 const r = await origFetch(input, init);
                 if (!b.is_simulation) {
-                    if (sNum) { window.location.href = "tel:" + sNum; }
-                    else { showNotice("⚠️ No emergency number saved! Please enter and save a phone number in the 'Permanent SOS Auto-Call Number' box."); }
+                    if (!sNum) {
+                        showNotice("⚠️ No emergency number saved! Please enter and save a phone number in the 'Permanent SOS Auto-Call Number' box.");
+                    } else {
+                        // Website browsers must wait for an explicit user tap on "Call Saved Number".
+                        // Android APK automatic SOS calling is handled by the native Android service.
+                        showNotice("SOS details recorded. Tap 'Call Saved Number' if you are using the website.");
+                    }
                 }
                 return r;
             } catch (e) {}
