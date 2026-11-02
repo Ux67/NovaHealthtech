@@ -2447,17 +2447,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
         return localStorage.getItem(SOS_NAME_KEY) || "My Emergency Contact";
     };
 
-    const origClick = HTMLAnchorElement.prototype.click;
-    HTMLAnchorElement.prototype.click = function() {
-        const h = (this.getAttribute("href") || this.href || "").trim();
-        if (h.toLowerCase() === "tel:108") {
-            const s = window.__getSavedSosAutoCallNumber();
-            if (!s) return;
-            this.setAttribute("href", "tel:" + s);
-            this.href = "tel:" + s;
-        }
-        return origClick.apply(this, arguments);
-    };
+    // Explicit tel:108 links remain emergency-service links; auto-call uses the native saved-contact bridge.
 
     function refreshUi() {
         const sNum = window.__getSavedSosAutoCallNumber();
@@ -3104,20 +3094,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                     ).join("");
                 };
 
-                const origAnchorClick = HTMLAnchorElement.prototype.click;
-                HTMLAnchorElement.prototype.click = function() {
-                    const h = (this.getAttribute('href') || this.href || '').trim();
-                    if (h.toLowerCase() === 'tel:108') {
-                        const saved = window.__getSavedSosAutoCallNumber();
-                        if (!saved) {
-                            window.__callDbEmergencyNumberNow();
-                            return;
-                        }
-                        this.setAttribute('href', 'tel:' + saved);
-                        this.href = 'tel:' + saved;
-                    }
-                    return origAnchorClick.apply(this, arguments);
-                };
+                // Do not rewrite explicit emergency-service tel:108 links.
 
                 async function gtxTranslate(text, targetLang) {
                     if (!text || !targetLang || targetLang === 'en') return text;
@@ -4052,11 +4029,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                     bgBtn.style.color = "#FFFFFF";
                 }
 
-                document.querySelectorAll('a[href^="tel:108"], #call108NowBtn').forEach(el => {
-                    if (el.closest("#hospitalsGrid") || el.closest("#medicineStoresGrid")) return;
-                    el.textContent = savedNum ? ("📞 Call " + savedName + " (" + savedNum + ")") : "Save SOS Number";
-                    el.setAttribute("href", savedNum ? ("tel:" + savedNum) : "javascript:window.__openFeatureScreen('sos')");
-                });
+                // The top emergency bar always remains a direct Call 108 action.
             };
 
             function mountNavigationDrawerAndModals() {
