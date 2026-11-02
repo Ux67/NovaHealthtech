@@ -33,6 +33,8 @@ jobs:
         run: |
           ! grep -Eq 'alert[[:space:]]*\(' frontend/script.js
           ! grep -q 'lang-selector-panel' frontend/script.js
+          grep -q 'android.permission.CALL_PHONE' android_companion/app/src/main/AndroidManifest.xml
+          grep -q 'executeBackgroundEmergencyCall(targetNumber, candidateImpactPeakMs2)' android_companion/app/src/main/java/in/novahealthtech/companion/AccidentDetectionService.kt
   android-debug-build:
     runs-on: ubuntu-latest
     steps:
@@ -41,11 +43,14 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
+      - name: Configure Android SDK path
+        run: echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> "$GITHUB_ENV"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.5"
       - name: Install Android SDK
-        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+        run: |
+          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
       - name: Build Android debug APK
         run: gradle -p android_companion assembleDebug --no-daemon
