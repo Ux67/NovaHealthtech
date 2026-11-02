@@ -3608,7 +3608,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                                 window.NovaAndroidBridge.placeDirectCall(savedTargetNum);
                                 callPlaced = true;
                             }
-                            statusMsg = "Emergency dialer opened for " + savedTargetName + " (" + savedTargetNum + "). Review and tap Call to continue.";
+                            statusMsg = "Android emergency call requested for " + savedTargetName + " (" + savedTargetNum + "). Check the phone call status.";
                         }
 
                         return new Response(JSON.stringify({
