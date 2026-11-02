@@ -741,7 +741,12 @@ class MainActivity : AppCompatActivity() {
         fun openAccessibilitySettings() {
             runOnUiThread {
                 try {
-                    startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:$packageName")
+                        )
+                    )
                 } catch (_: Exception) {}
             }
         }
@@ -2413,7 +2418,7 @@ class MainActivity : AppCompatActivity() {
                         '<button type="button" class="nova-drawer-item" data-feature="directory" onclick="window.__openFeatureScreen(\'directory\')">🏥 36 States Hospitals &amp; Pharmacies</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="consult" onclick="window.__openFeatureScreen(\'consult\')">👨‍⚕️ Doctor Callback Consultation</button>' +
                         '<button type="button" class="nova-drawer-item" data-feature="reminders" onclick="window.__openFeatureScreen(\'reminders\')">⏰ Medicine Dosage Reminders</button>' +
-                        '<button type="button" class="nova-drawer-item" data-feature="accessibility" onclick="window.__openFeatureScreen(\'accessibility\')">⚙️ Accessibility &amp; Background Auto-Call</button>' +
+                        '<button type="button" class="nova-drawer-item" data-feature="accessibility" onclick="window.__openFeatureScreen(\'accessibility\')">⚙️ Background Accident Monitoring &amp; App Permissions</button>' +
                         '<div style="margin-top:auto; padding-top:0.85rem; border-top:1px solid #E2E8F0;">' +
                             '<button id="novaDrawerLoginBtn" type="button" onclick="window.__openLoginDashboardScreen()" style="width:100% !important;">Log In / Sign Up</button>' +
                         '</div>';
@@ -2513,14 +2518,14 @@ class MainActivity : AppCompatActivity() {
                     const accSec = document.createElement("section");
                     accSec.id = "novaStandaloneAccessibilityScreen";
                     accSec.innerHTML =
-                        '<h2>⚙️ Accessibility &amp; Background Auto-Calling</h2>' +
+                        '<h2>⚙️ Background Accident Monitoring &amp; App Permissions</h2>' +
                         '<p style="margin-bottom:0.8rem;">Control whether accident monitoring continues after the app is closed. A countdown alert will appear; you can open the saved contact in the phone dialer and confirm the call.</p>' +
                         '<div style="padding:0.95rem; border-radius:10px; background:#F8FAFC; border:1px solid #E2E8F0;">' +
                             '<div style="font-size:0.78rem; color:#64748B; margin-bottom:0.2rem;">Background Accident Monitoring Status:</div>' +
                             '<div id="novaBgAutoCallStatusBadge" style="font-weight:700; font-size:0.9rem; margin-bottom:0.8rem;"></div>' +
                             '<div style="display:grid; grid-template-columns:1fr; gap:0.5rem;">' +
                                 '<button id="novaBgAutoCallToggleBtn" type="button" onclick="window.__toggleBackgroundAutoCallSetting()"></button>' +
-                                '<button type="button" onclick="window.__openNativeAccessibilitySettings()" style="background:#F1F5F9 !important; color:#0F172A !important; border:1px solid #CBD5E1 !important;">Open Android Accessibility Settings</button>' +
+                                '<button type="button" onclick="window.__openNativeAccessibilitySettings()" style="background:#F1F5F9 !important; color:#0F172A !important; border:1px solid #CBD5E1 !important;">Open Android App Permissions</button>' +
                             '</div>' +
                         '</div>';
                     mainContainer.appendChild(accSec);
