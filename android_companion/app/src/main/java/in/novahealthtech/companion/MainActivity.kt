@@ -142,9 +142,8 @@ object NovaAutoCallCoordinator {
     @Volatile
     var serviceInstance: NovaAutoCallAccessibilityService? = null
 
-    fun scheduleImmediateDialerTap() {
-        serviceInstance?.triggerTimedDialerTaps()
-    }
+    // Intentionally disabled: accessibility automation must never tap a phone call button.
+    fun scheduleImmediateDialerTap() = Unit
 }
 
 class NovaAutoCallAccessibilityService : AccessibilityService() {
@@ -203,47 +202,10 @@ class NovaAutoCallAccessibilityService : AccessibilityService() {
         return false
     }
 
-    fun triggerTimedDialerTaps() {
-        if (!NovaAutoCallCoordinator.isAppInForeground && !isBackgroundAutoCallAllowed()) {
-            return
-        }
-        val delays = listOf(700L, 1200L, 1750L, 2350L, 3000L, 3700L)
-        for (delay in delays) {
-            mainHandler.postDelayed({
-                val now = System.currentTimeMillis()
-                if (now - NovaAutoCallCoordinator.autoCallRequestedAtMs <= 7000L) {
-                    if (isCallAlreadyActive()) {
-                        NovaAutoCallCoordinator.autoCallRequestedAtMs = 0L
-                    } else {
-                        performDialerGreenButtonClick()
-                    }
-                }
-            }, delay)
-        }
-    }
+    // Accessibility is not used to simulate taps or accept phone-call dialogs.
+    fun triggerTimedDialerTaps() = Unit
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (!NovaAutoCallCoordinator.isAppInForeground && !isBackgroundAutoCallAllowed()) return
-
-        val now = System.currentTimeMillis()
-        if (now - NovaAutoCallCoordinator.autoCallRequestedAtMs > 7000L) return
-        if (now - lastEventTapMs < 450L) return
-
-        val pkg = event?.packageName?.toString()?.lowercase() ?: ""
-        if (pkg.contains("novahealthtech") || pkg.contains("systemui")) return
-
-        if (isCallAlreadyActive() || pkg.contains("incallui")) {
-            NovaAutoCallCoordinator.autoCallRequestedAtMs = 0L
-            return
-        }
-
-        lastEventTapMs = now
-        mainHandler.postDelayed({
-            if (System.currentTimeMillis() - NovaAutoCallCoordinator.autoCallRequestedAtMs <= 7000L && !isCallAlreadyActive()) {
-                performDialerGreenButtonClick()
-            }
-        }, 450L)
-    }
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
     private fun getRealScreenDimensions(): Pair<Float, Float> {
         try {
@@ -381,7 +343,7 @@ class MainActivity : AppCompatActivity() {
     private var lastAutoCallTimestampMs: Long = 0L
     private var accessibilityDialogShown: Boolean = false
 
-    private val REMOTE_BACKEND_URL = ""
+    private val REMOTE_BACKEND_URL = "https://novahealthtech-2-0.onrender.com"
 
     companion object {
         private const val PERMISSION_REQ_CODE = 1080
@@ -803,25 +765,11 @@ class MainActivity : AppCompatActivity() {
             showConfigureEmergencyContactPrompt()
             return
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Automatic calling needs the Phone permission. Enable it in Android app permissions.", Toast.LENGTH_LONG).show()
-            try { startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null))) } catch (_: Exception) {}
-            return
-        }
-        val prefs = getSharedPreferences(NovaAutoCallCoordinator.PREFS_NAME, Context.MODE_PRIVATE)
-        val now = System.currentTimeMillis()
-        val lastAttempt = prefs.getLong(AccidentDetectionService.KEY_LAST_CALL_ATTEMPT_AT_MS, 0L)
-        if (now - lastAttempt < 60_000L) return
-        prefs.edit().putLong(AccidentDetectionService.KEY_LAST_CALL_ATTEMPT_AT_MS, now).apply()
+        // Show the OS dialer with the saved/selected number. The user makes the final call action.
         try {
-            val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            telecomManager.placeCall(Uri.fromParts("tel", cleanNumber, null), android.os.Bundle())
+            startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", cleanNumber, null)))
         } catch (_: Exception) {
-            try {
-                startActivity(Intent(Intent.ACTION_CALL, Uri.fromParts("tel", cleanNumber, null)))
-            } catch (_: Exception) {
-                Toast.makeText(this, "Unable to place the emergency call. Use your phone's emergency calling feature.", Toast.LENGTH_LONG).show()
-            }
+            Toast.makeText(this, "Unable to open the phone dialer. Please use your phone's calling app.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -1846,15 +1794,37 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     if (REMOTE_API && (rawUrl.includes('/api/') || rawUrl.startsWith('api/'))) {
+                        let timeoutId = null;
                         try {
-                            const pathPart = rawUrl.substring(rawUrl.indexOf('/api/'));
-                            const ctrl = new AbortController();
-                            const tId = setTimeout(() => ctrl.abort(), 4000);
-                            const mergedInit = Object.assign({}, init || {}, { signal: ctrl.signal });
-                            const remoteRes = await origFetch(REMOTE_API + pathPart, mergedInit);
-                            clearTimeout(tId);
-                            if (remoteRes.ok) return remoteRes;
-                        } catch (_) {}
+                            const parsedUrl = new URL(rawUrl, window.location.href);
+                            const apiPath = parsedUrl.pathname + parsedUrl.search;
+                            if (!apiPath.startsWith('/api/')) {
+                                return new Response(JSON.stringify({
+                                    status: "error",
+                                    message: "Invalid API path."
+                                }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+                            }
+                            const controller = new AbortController();
+                            timeoutId = setTimeout(() => controller.abort(), 30000);
+                            const requestInit = Object.assign({}, init || {}, {
+                                signal: controller.signal,
+                                cache: "no-store"
+                            });
+                            // Return the real backend response, including HTTP errors.
+                            // Never replace a failed live request with a fake success response.
+                            return await origFetch(REMOTE_API + apiPath, requestInit);
+                        } catch (error) {
+                            const message = error && error.name === "AbortError"
+                                ? "Nova Healthtech backend timed out. Please retry when the connection is stable."
+                                : "Nova Healthtech backend is unreachable. Check the internet connection and Render service status.";
+                            return new Response(JSON.stringify({
+                                status: "error",
+                                backend_reachable: false,
+                                message: message
+                            }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+                        } finally {
+                            if (timeoutId !== null) clearTimeout(timeoutId);
+                        }
                     }
 
                     const method = ((init && init.method) || 'GET').toUpperCase();
