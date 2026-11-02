@@ -25,7 +25,9 @@ import requests
 try:
     from api_key_config import GEMINI_API_KEY as CONFIG_FILE_KEY
 except ImportError:
-    CONFIG_FILE_KEY = "AQ.Ab8RN6LWsU2x9Vvg9UP2TkTSKOCWeXxm5PI5Wx1TzgMAEajf5w"
+    # API credentials must be supplied through the deployment environment.
+    # Never commit a live API key into a public repository.
+    CONFIG_FILE_KEY = ""
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BACKEND_DIR = os.path.abspath(os.path.dirname(__file__))
