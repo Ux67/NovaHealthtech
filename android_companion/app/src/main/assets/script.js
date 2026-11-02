@@ -1050,21 +1050,22 @@ async function cancelActiveSosWorkflow(reasonText) {
   }
 }
 
-function triggerAutomaticAmbulanceCall(emergencyNumber = "108") {
+function triggerAutomaticAmbulanceCall() {
+  const savedNumber = window.__getSavedSosAutoCallNumber
+    ? String(window.__getSavedSosAutoCallNumber() || "").replace(/[^0-9+]/g, "")
+    : "";
+  if (!savedNumber || !/^\\+?[0-9]{7,15}$/.test(savedNumber)) {
+    if (typeof showNotice === "function") showNotice("No valid emergency contact is saved. No call was placed.", "warning");
+    return;
+  }
   try {
     if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
-      window.NovaAndroidBridge.placeDirectCall(String(emergencyNumber));
+      window.NovaAndroidBridge.placeDirectCall(savedNumber);
       return;
     }
-
-    const tempAnchor = document.createElement("a");
-    tempAnchor.href = `tel:${emergencyNumber}`;
-    tempAnchor.style.display = "none";
-    document.body.appendChild(tempAnchor);
-    tempAnchor.click();
-    setTimeout(() => tempAnchor.remove(), 1000);
+    window.location.href = "tel:" + savedNumber;
   } catch (e) {
-    window.location.href = `tel:${emergencyNumber}`;
+    window.location.href = "tel:" + savedNumber;
   }
 }
 
@@ -1095,7 +1096,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
     is_simulation: isSim,
     auto_triggered_after_8s: true,
     place_direct_phone_call: !isSim,
-    target_ambulance_number: "108",
+    target_ambulance_number: (window.__getSavedSosAutoCallNumber ? window.__getSavedSosAutoCallNumber() : ""),
     latitude: hasGps ? latestGpsPosition.latitude : null,
     longitude: hasGps ? latestGpsPosition.longitude : null,
     accuracy_meters: hasGps ? latestGpsPosition.accuracy_meters : null,
@@ -1167,7 +1168,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
     }
 
     if (!isSim && !inc.direct_call_placed) {
-      triggerAutomaticAmbulanceCall("108");
+      triggerAutomaticAmbulanceCall();
     }
   } catch (err) {
     if (reportBox) {
@@ -1176,7 +1177,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
       stampEnglishBaseline(reportBox);
     }
     if (!isSim) {
-      triggerAutomaticAmbulanceCall("108");
+      triggerAutomaticAmbulanceCall();
     }
   } finally {
     isSosEscalationInFlight = false;
@@ -2138,16 +2139,23 @@ async function initHealthCheck() {
 // AUTOMATIC ACCIDENT DETECTION & 8-SECOND AUTO-DIAL 108 MODULE
 // ============================================================================
 
-function triggerAutomaticAmbulanceCall(emergencyNumber = "108") {
-    try {
-        if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
-            window.NovaAndroidBridge.placeDirectCall(String(emergencyNumber));
-            return;
-        }
-        window.location.href = `tel:${emergencyNumber}`;
-    } catch (e) {
-        window.location.href = `tel:${emergencyNumber}`;
+function triggerAutomaticAmbulanceCall() {
+  const savedNumber = window.__getSavedSosAutoCallNumber
+    ? String(window.__getSavedSosAutoCallNumber() || "").replace(/[^0-9+]/g, "")
+    : "";
+  if (!savedNumber || !/^\\+?[0-9]{7,15}$/.test(savedNumber)) {
+    if (typeof showNotice === "function") showNotice("No valid emergency contact is saved. No call was placed.", "warning");
+    return;
+  }
+  try {
+    if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
+      window.NovaAndroidBridge.placeDirectCall(savedNumber);
+      return;
     }
+    window.location.href = "tel:" + savedNumber;
+  } catch (e) {
+    window.location.href = "tel:" + savedNumber;
+  }
 }
 
 async function executeSosEscalation(triggerSource, sensorPayload) {
@@ -2173,7 +2181,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
         is_simulation: isSim,
         auto_triggered_after_8s: true,
         place_direct_phone_call: !isSim,
-        target_ambulance_number: "108",
+        target_ambulance_number: (window.__getSavedSosAutoCallNumber ? window.__getSavedSosAutoCallNumber() : ""),
         latitude: hasGps ? latestGpsPosition.latitude : null,
         longitude: hasGps ? latestGpsPosition.longitude : null,
         accuracy_meters: hasGps ? latestGpsPosition.accuracy_meters : null,
@@ -2192,11 +2200,11 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
         const inc = data.incident || {};
 
         if (!isSim) {
-            triggerAutomaticAmbulanceCall("108");
+            triggerAutomaticAmbulanceCall();
         }
     } catch (err) {
         if (!isSim) {
-            triggerAutomaticAmbulanceCall("108");
+            triggerAutomaticAmbulanceCall();
         }
     } finally {
         isSosEscalationInFlight = false;
@@ -2361,13 +2369,7 @@ async function executeSosEscalation(triggerSource, sensorPayload) {
                 try { data = await clone.json(); } catch (e) {}
 
                 if (!bodyObj.is_simulation) {
-                    if (savedNum) {
-                        if (window.NovaAndroidBridge && typeof window.NovaAndroidBridge.placeDirectCall === "function") {
-                            window.NovaAndroidBridge.placeDirectCall(savedNum);
-                        } else {
-                            window.location.href = "tel:" + savedNum;
-                        }
-                    } else {
+                    if (!savedNum) {
                         const fb = document.getElementById("novaCustomSosFeedbackText");
                         if (fb) {
                             fb.style.color = "#fda4af";
