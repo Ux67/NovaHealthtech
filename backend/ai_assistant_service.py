@@ -1734,7 +1734,8 @@ class AIAssistantService:
         return web_info
 
     def _call_llm_for_medicine_or_disease(
-        self, en_query: str, mode: str, reference_notes: str, api_key: str
+        self, en_query: str, mode: str, reference_notes: str, api_key: str,
+        history: Optional[List[Dict[str, str]]] = None,
     ) -> Optional[str]:
         """
         Uses Gemini 2.5 Flash (when configured) with strict non-fabrication and separation rules.
@@ -1744,31 +1745,34 @@ class AIAssistantService:
 
         if mode == "MEDICINE":
             sys_prompt = (
-                "You are Nova AI, a clinical pharmacology reference assistant. "
-                "Provide accurate, verified medicine information for the user's query using the following structure:\n"
-                "1. **Active Ingredients / Generic Salt & Category**\n"
-                "2. **Approved Clinical Uses**\n"
-                "3. **Side Effects (Common vs. Serious)**\n"
-                "4. **Contraindications (Who Must Avoid It)**\n"
-                "5. **Drug & Food Interactions**\n"
-                "6. **Clinical Warnings & Administration Principles**\n"
-                "STRICT RULES: Never prescribe individualized dosages without clinical oversight. "
-                "If a rare or regional brand name cannot be verified with certainty, explicitly state that its exact composition/availability cannot be verified and advise checking the physical medicine strip with a licensed pharmacist or doctor. Never fabricate ingredients. Never use '$' symbols."
+                "You are Nova, a careful, friendly medical and medicine information companion. "
+                "Answer the exact medicine question the user asked first. Stay strictly within medicine, "
+                "pharmacology, health, and clinical science. Never drift into history, companies, geography, "
+                "or unrelated topics. Identify the active ingredient only when reliable; distinguish brand "
+                "names from generic names and country-specific formulations. Explain uses, how it works, "
+                "common and serious side effects, important interactions, contraindications, and what must "
+                "be checked on the package. If the exact brand or formulation cannot be verified, say so "
+                "plainly and ask for the active ingredient or a clear photo of the label. Do not guess. "
+                "Do not prescribe a personal dose, tell a user to start/stop/change a medicine, or replace "
+                "a pharmacist/doctor. Use plain language, define medical terms, and keep the answer focused. "
+                "When useful, finish with one relevant follow-up question."
             )
         else:
             sys_prompt = (
-                "You are Nova AI, a medical education and clinical guidance assistant. "
-                "Answer the user's disease, symptom, or general medical question clearly using relevant sections:\n"
-                "1. **Clinical Overview**\n"
-                "2. **Causes & Risk Factors**\n"
-                "3. **Symptoms & Red-Flag Warning Signs**\n"
-                "4. **Diagnostic Tests & Clinical Evaluation**\n"
-                "5. **Precautions, Prevention & Supportive Care**\n"
-                "6. **Specialist Doctor & Emergency Guidance**\n"
-                "STRICT RULES: Keep disease guidance separate from medicine recommendations—DO NOT list or recommend specific medicines or drug dosages for general disease questions. "
-                "Clearly state any clinical uncertainty for rare or complex conditions, never fabricate facts, and never use '$' symbols."
+                "You are Nova, an interactive, patient-friendly medical education companion. "
+                "The user is asking a medical, health, symptom, body-system, mental-health, diagnostic, "
+                "treatment-science, or medicine-related question. Answer the exact question directly in "
+                "the first 1-2 sentences. Stay strictly on the user's topic. Do not substitute a similarly "
+                "named company, person, historical event, or unrelated Wikipedia topic. If an acronym is "
+                "ambiguous, use the surrounding medical wording; for example BP in a question about symptoms "
+                "means blood pressure. Explain concepts in simple everyday language, then add only the most "
+                "relevant causes, signs, tests, care options, and warning signs. Do not force every answer "
+                "into a long generic template. Do not invent a diagnosis or claim certainty from symptoms. "
+                "Do not prescribe individualized medicine or dosages. For emergencies, clearly advise urgent "
+                "local medical help. If the question is outside medicine, politely say Nova is a medical-only "
+                "assistant and invite a health or medicine question. Be warm, conversational, concise but "
+                "complete, and ask at most one useful follow-up question."
             )
-
         if reference_notes:
             sys_prompt += f"\n\nVERIFIED REFERENCE CONTEXT:\n{reference_notes[:1600]}"
 
@@ -1778,8 +1782,16 @@ class AIAssistantService:
                 params={"key": api_key},
                 json={
                     "system_instruction": {"parts": [{"text": sys_prompt}]},
-                    "contents": [{"role": "user", "parts": [{"text": en_query}]}],
-                    "generationConfig": {"temperature": 0.2, "maxOutputTokens": 700},
+                    "contents": (
+                        [
+                            {"role": "user" if item.get("role") == "user" else "model",
+                             "parts": [{"text": str(item.get("text", ""))[:1200]}]}
+                            for item in (history or [])[-6:]
+                            if isinstance(item, dict) and str(item.get("text", "")).strip()
+                        ]
+                        + [{"role": "user", "parts": [{"text": en_query[:1200]}]}]
+                    ),
+                    "generationConfig": {"temperature": 0.35, "maxOutputTokens": 1000},
                 },
                 timeout=5.5,
             )
@@ -2048,10 +2060,6 @@ class AIAssistantService:
         lang_name = LANGUAGE_NAMES[lang_code]
         api_key = self.get_api_key()
         history = history or []
-        prior_user_notes = " | ".join([str(m.get("text", "")).strip() for m in history if isinstance(m, dict) and m.get("role") == "user" and m.get("text")][-6:])
-        if prior_user_notes and len(user_message.split()) <= 12:
-            user_message = f"{user_message} (Patient prior chat history context: {prior_user_notes})"
-
         normalized_user_msg = normalize_indic_digits_to_ascii(user_message)
         if all(ord(c) < 128 for c in normalized_user_msg):
             en_query = normalized_user_msg
@@ -2093,11 +2101,13 @@ class AIAssistantService:
         # ======================================================================
         topic = self._extract_medical_topic(en_query)
         builtin_data = matched_obj or self._fuzzy_match_clinical_disease(normalized_user_msg, topic) or {}
-        web_data = {} if builtin_data else self._fetch_live_web_medical_data(topic)
 
-        # If neither built-in nor Wikipedia has verified data, try Gemini with strict non-fabrication & no-medicine rules
-        if not builtin_data and not web_data.get("overview") and api_key:
-            llm_disease = self._call_llm_for_medicine_or_disease(en_query, "DISEASE", "", api_key)
+        # Ask the conversational medical model first. Do not let a broad encyclopedia search
+        # replace a medical acronym (for example BP) with an unrelated company or history page.
+        if api_key:
+            llm_disease = self._call_llm_for_medicine_or_disease(
+                en_query, "DISEASE", "", api_key, history=history
+            )
             if llm_disease:
                 english_reply = strip_latex_artifacts(
                     f"🩺 **Nova AI • Clinical Disease & Symptom Guidance: {topic.title()}**\n\n"
@@ -2116,8 +2126,29 @@ class AIAssistantService:
                     "safety_disclaimer": "🟢 AI Online • Non-Diagnostic Clinical Reference",
                 }
 
-        is_verified_condition = bool(builtin_data or web_data.get("overview"))
-        title = builtin_data.get("title") or web_data.get("title") or topic.title() or en_query.title()
+        # Use only locally curated clinical data when the live model is unavailable.
+        # Never fall back to a general encyclopedia result for a medical query.
+        web_data = {}
+        if not builtin_data:
+            fallback_reply = (
+                "I couldn't retrieve a reliable medical answer just now. Please try again in a moment, "
+                "or rephrase the question with the condition, symptom, or medicine name. I won't guess "
+                "or replace your question with an unrelated topic. If this is urgent, contact a qualified "
+                "medical professional or local emergency service."
+            )
+            final_reply = translate_multiline_response(fallback_reply, target_lang=lang_code) if lang_code != "en" else fallback_reply
+            return {
+                "source": "nova_ai_unavailable",
+                "model": "Medical answer unavailable",
+                "api_connected": False,
+                "language": lang_code,
+                "reply": final_reply,
+                "english_reply": fallback_reply,
+                "safety_disclaimer": "Medical information service temporarily unavailable",
+            }
+
+        is_verified_condition = bool(builtin_data)
+        title = builtin_data.get("title") or topic.title() or en_query.title()
 
         if is_verified_condition:
             overview = builtin_data.get("overview") or web_data.get("overview")
