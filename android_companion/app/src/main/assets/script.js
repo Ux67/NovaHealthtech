@@ -1042,7 +1042,7 @@ async function cancelActiveSosWorkflow(reasonText) {
     reportBox.hidden = false;
     reportBox.innerHTML = `
       <p style="color:#49E6C4; font-weight:700;">
-        ✓ 8-Second Countdown Cancelled (${reasonText}). Automatic ambulance call &amp; location transmission aborted.
+        ✓ 8-Second Countdown Cancelled (${reasonText}). Saved-contact dialer action cancelled; location transmission aborted.
       </p>
     `;
     stampEnglishBaseline(reportBox);
@@ -2254,11 +2254,11 @@ async function initHealthCheck() {
             if (savedNum) {
                 badgeEl.style.background = "rgba(16, 185, 129, 0.22)";
                 badgeEl.style.color = "#6ee7b7";
-                badgeEl.textContent = "📞 Saved Auto-Call Number: " + savedNum;
+                badgeEl.textContent = "📞 Saved Emergency Contact: " + savedNum;
             } else {
                 badgeEl.style.background = "rgba(244, 63, 94, 0.22)";
                 badgeEl.style.color = "#fda4af";
-                badgeEl.textContent = "⚠️ No Number Saved (Auto-Call Paused)";
+                badgeEl.textContent = "⚠️ No Emergency Contact Saved";
             }
         }
         if (removeBtn) {
@@ -2280,11 +2280,11 @@ async function initHealthCheck() {
         card.style.cssText = "margin: 0.85rem 0; padding: 0.9rem; border-radius: 12px; background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(20, 184, 166, 0.45);";
         card.innerHTML =
             '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.45rem;">' +
-                '<strong style="color:#5eead4; font-size:0.9rem;">📌 Emergency SOS Auto-Call Contact Number</strong>' +
+                '<strong style="color:#5eead4; font-size:0.9rem;">📌 Emergency SOS Contact Number</strong>' +
                 '<span id="novaCustomSosStatusBadge" style="font-size:0.76rem; padding:0.2rem 0.55rem; border-radius:999px; font-weight:600;"></span>' +
             '</div>' +
             '<p id="novaCustomSosFeedbackText" style="font-size:0.78rem; color:#cbd5e1; margin:0 0 0.55rem 0;">' +
-                'Enter and save the phone number to call automatically when the SOS countdown expires. Remains saved until you change or remove it.' +
+                'Enter and save a trusted contact. When the SOS countdown expires, Nova opens this number in the phone dialer. You must tap Call to connect.' +
             '</p>' +
             '<div style="display:flex; flex-wrap:wrap; gap:0.5rem;">' +
                 '<input id="novaCustomSosNumInput" type="tel" placeholder="Enter phone number (e.g. 9876543210)" value="' + savedNum.replace(/"/g, "&quot;") + '" ' +
@@ -2308,7 +2308,7 @@ async function initHealthCheck() {
             if (fb) {
                 fb.style.color = res.ok ? "#6ee7b7" : "#fda4af";
                 fb.textContent = res.ok
-                    ? "✅ Emergency SOS Auto-Call Number saved: " + res.number
+                    ? "✅ Emergency Contact Saved: " + res.number
                     : "⚠️ " + res.message;
             }
         });
@@ -2318,7 +2318,7 @@ async function initHealthCheck() {
             const fb = document.getElementById("novaCustomSosFeedbackText");
             if (fb) {
                 fb.style.color = "#fcd34d";
-                fb.textContent = "⚠️ Emergency contact removed. Please configure an emergency contact number to enable SOS auto-calling.";
+                fb.textContent = "⚠️ Emergency contact removed. Please configure an emergency contact number to use the saved-contact dialer action.";
             }
         });
 
@@ -2346,7 +2346,7 @@ async function initHealthCheck() {
                         const fb = document.getElementById("novaCustomSosFeedbackText");
                         if (fb) {
                             fb.style.color = "#fda4af";
-                            fb.textContent = "⚠️ SOS Auto-Call Paused: No emergency contact number is saved. Please enter and save a valid phone number below.";
+                            fb.textContent = "⚠️ SOS contact action paused: No emergency contact number is saved. Please enter and save a valid phone number below.";
                         }
                         showNotice("No emergency contact is configured. Save a trusted contact before using the SOS dialer action.", "warning");
                         document.getElementById("novaCustomSosNumInput")?.focus();
@@ -2356,7 +2356,7 @@ async function initHealthCheck() {
                 if (data && data.incident) {
                     if (!savedNum) {
                         data.incident.direct_call_placed = false;
-                        data.incident.dispatch_status_message = "⚠️ Auto-Call Not Placed: No emergency contact configured. Please save an emergency contact phone number in the SOS setting above.";
+                        data.incident.dispatch_status_message = "⚠️ No emergency contact is configured. Please save an emergency contact phone number in the SOS setting above.";
                      } else if (!bodyObj.is_simulation) {
                          data.incident.direct_call_placed = false;
                          data.incident.dispatch_status_message = "Saved-contact call request is handled by Android; call completion is not confirmed by the website.";
@@ -2439,7 +2439,7 @@ async function initHealthCheck() {
         card.style.cssText = "margin:0.85rem 0;padding:0.9rem;border-radius:12px;background:rgba(15,23,42,0.65);border:1.5px solid rgba(20,184,166,0.45);";
         card.innerHTML =
             '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.45rem;">' +
-                '<strong style="color:#5eead4;font-size:0.92rem;">📌 Permanent SOS Auto-Call Number</strong>' +
+                '<strong style="color:#5eead4;font-size:0.92rem;">📌 Permanent SOS Contact Number</strong>' +
                 '<span id="novaCustomSosStatusBadge" style="font-size:0.76rem;padding:0.2rem 0.55rem;border-radius:999px;font-weight:600;"></span>' +
             '</div>' +
             '<p id="novaCustomSosFeedbackText" style="font-size:0.78rem;color:#cbd5e1;margin:0 0 0.55rem 0;">Save anyone\'s phone number permanently below. When SOS is triggered, it will ONLY call this saved number until you change or remove it.</p>' +
@@ -2473,7 +2473,7 @@ async function initHealthCheck() {
             const i1 = document.getElementById("novaCustomSosNumInput"); if (i1) i1.value = "";
             const i2 = document.getElementById("novaCustomSosNameInput"); if (i2) i2.value = "";
             const fb = document.getElementById("novaCustomSosFeedbackText");
-            if (fb) { fb.style.color = "#fcd34d"; fb.textContent = "⚠️ Number removed. Enter a new number to enable SOS auto-calling."; }
+            if (fb) { fb.style.color = "#fcd34d"; fb.textContent = "⚠️ Number removed. Enter a new number to use the saved-contact dialer action."; }
             refreshUi();
         });
         refreshUi();
@@ -2917,7 +2917,7 @@ async function initHealthCheck() {
                     const nIn = document.getElementById('novaDbSosNumInput'); if (nIn) nIn.value = '';
                     const nmIn = document.getElementById('novaDbSosNameInput'); if (nmIn) nmIn.value = '';
                     const fb = document.getElementById('novaDbSosFeedback');
-                    if (fb) { fb.style.color = '#D97706'; fb.textContent = 'Number removed from database. Enter a new number above to enable SOS auto-calling.'; }
+                    if (fb) { fb.style.color = '#D97706'; fb.textContent = 'Number removed from database. Enter a new number above to use the saved-contact dialer action.'; }
                     window.__syncAppHeaderAndAuthUi();
                 };
 
