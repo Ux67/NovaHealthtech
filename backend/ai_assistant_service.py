@@ -1787,13 +1787,18 @@ class AIAssistantService:
                             {"role": "user" if item.get("role") == "user" else "model",
                              "parts": [{"text": str(item.get("text", ""))[:1200]}]}
                             for item in (history or [])[-6:]
-                            if isinstance(item, dict) and str(item.get("text", "")).strip()
+                            if isinstance(item, dict)
+                            and str(item.get("text", "")).strip()
+                            and not (
+                                item.get("role") == "user"
+                                and str(item.get("text", "")).strip().casefold() == en_query.strip().casefold()
+                            )
                         ]
                         + [{"role": "user", "parts": [{"text": en_query[:1200]}]}]
                     ),
                     "generationConfig": {"temperature": 0.35, "maxOutputTokens": 1000},
                 },
-                timeout=5.5,
+                timeout=20,
             )
             if gem_res.ok:
                 candidates = gem_res.json().get("candidates", [])
@@ -1849,7 +1854,6 @@ class AIAssistantService:
             verification_note = "• **Source Verification:** Verified against indexed clinical pharmacology / OpenFDA drug labeling records."
         else:
             web_med = self._search_live_web_for_indian_brand(cleaned_title, base_drug)
-            wiki_med = self._fetch_live_web_medical_data(base_drug)
             llm_med = self._call_llm_for_medicine_or_disease(
                 en_query, "MEDICINE", web_med.get("uses", ""), api_key, history=history
             )
@@ -1874,14 +1878,14 @@ class AIAssistantService:
                     "safety_disclaimer": "🟢 AI Online • Verified Pharmacology Reference",
                 }
 
-            has_verified_extract = bool(web_med["composition"] or web_med["uses"] or wiki_med["overview"])
+            has_verified_extract = bool(web_med["composition"] or web_med["uses"])
             composition = (
                 web_med["composition"]
-                or (f"{wiki_med['title']} (Active Agent)" if wiki_med["overview"] else "Unverified Regional / Specialty Brand Name")
+                or "Unverified Regional / Specialty Brand Name"
             )
             strengths_info = detected_strength or "Refer to physical manufacturer strip"
             if has_verified_extract:
-                uses = web_med["uses"] or f"• {wiki_med['overview']}"
+                uses = web_med["uses"]
                 verification_note = "• **Verification Note:** Retrieved from live medical literature; always verify regional brand salt composition on the physical blister pack."
             else:
                 uses = (
