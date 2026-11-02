@@ -84,14 +84,14 @@
       </div>
     </section>
 
-    <!-- MODULE 0: AUTOMATIC ACCIDENT DETECTION, 8-SECOND AUTO-CALL & REAL GPS LOCATION TRANSMISSION -->
+    <!-- MODULE 0: IMPACT MONITORING, SOS CONFIRMATION COUNTDOWN & GPS -->
     <section id="sosEmergencyModule" class="triage-module glass-panel" aria-labelledby="sosHeading" style="border: 1px solid rgba(255, 92, 119, 0.45);">
       <div class="section-header-row">
         <div>
-          <span class="eyebrow" style="color: #ff7b93;">AUTO-ACTIVE SENSOR-FUSION MONITOR • 8s AUTO-AMBULANCE CALL &amp; LIVE GPS</span>
+          <span class="eyebrow" style="color: #ff7b93;">FOREGROUND IMPACT MONITOR • 8s SOS CONFIRMATION • LIVE GPS</span>
           <h2 id="sosHeading">🚨 Automatic Accident Detection &amp; Emergency SOS Center</h2>
           <p class="text-muted">
-            Foreground crash sensor monitoring is automatically active while this website is open. On impact or SOS trigger, an 8-second countdown starts and automatically shares your GPS location and calls 108 (Ambulance) unless cancelled.
+            Impact monitoring runs while this app is active. A suspected severe impact starts an 8-second cancellation window. Afterward, Nova prompts you to review the saved emergency contact in the phone dialer. Calls are never placed silently.
           </p>
         </div>
         <div id="sosMonitorBadge" class="status-pill status-pill--online" role="status" aria-live="polite">
@@ -110,11 +110,11 @@
             </button>
 <div id="novaPermanentDbSosCard" style="margin: 0.9rem 0; padding: 1rem; border-radius: 14px; background: rgba(15, 23, 42, 0.88); border: 2px solid #14b8a6; box-shadow: 0 4px 20px rgba(20, 184, 166, 0.22);">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.5rem;">
-        <strong style="color:#5eead4; font-size:0.95rem;">📌 Emergency Auto-Call Number (Saved in Database)</strong>
+        <strong style="color:#5eead4; font-size:0.95rem;">📌 Trusted Emergency Contact (Saved in Database)</strong>
         <span id="novaDbSosBadge" style="font-size:0.78rem; padding:0.22rem 0.6rem; border-radius:999px; background:rgba(20,184,166,0.22); color:#6ee7b7; font-weight:700;">Checking Database...</span>
     </div>
     <p id="novaDbSosFeedback" style="font-size:0.8rem; color:#cbd5e1; margin:0 0 0.65rem 0;">
-        Save anyone's mobile number permanently below. When SOS is triggered, Emergency Auto-Caller will automatically call ONLY this saved number. Change it anytime.
+        Save a trusted person's mobile number. When SOS is triggered, Nova can open the phone dialer for you to review and place the call. Change it anytime.
     </p>
     <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
         <input id="novaDbSosNameInput" type="text" placeholder="Person's Name (e.g. Mom / Friend)" style="flex:1 1 135px; padding:0.6rem 0.75rem; border-radius:8px; border:1px solid rgba(94,234,212,0.45); background:#0f172a; color:#f8fafc; font-size:0.88rem;" />
@@ -134,7 +134,7 @@
           <div class="form-group checkbox-group" style="margin-top: 0.5rem;">
             <input type="checkbox" id="sosSafeSimulationToggle" />
             <label for="sosSafeSimulationToggle">
-              <strong>Safe Simulation / Test Mode:</strong> Check this box only if you want to test without placing the automatic emergency phone call.
+              <strong>Safe Simulation / Test Mode:</strong> Check this box to test without opening the phone dialer.
             </label>
           </div>
 
@@ -165,14 +165,14 @@
 
           <!-- Active 8-Second Countdown Box -->
           <div id="sosCountdownModal" class="triage-result triage-result--critical" hidden aria-live="assertive" style="margin-bottom: 1rem;">
-            <h3 id="sosAlertHeadline">🚨 IMPACT / SOS DETECTED — AUTO-CALLING SAVED EMERGENCY CONTACT</h3>
-            <p id="sosAlertDetails">Acquiring &amp; sharing live GPS location with Ambulance (108)...</p>
+            <h3 id="sosAlertHeadline">🚨 IMPACT / SOS DETECTED — REVIEW EMERGENCY ALERT</h3>
+            <p id="sosAlertDetails">Preparing available location details for your emergency contact...</p>
             <p style="font-size: 1.35rem; font-weight: 800; margin: 0.5rem 0;">
-              Auto-Calling Saved Contact &amp; Sharing Location in <span id="sosCountdownSeconds">8</span> seconds...
+              Emergency alert countdown:  <span id="sosCountdownSeconds">8</span> seconds...
             </p>
             <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem;">
               <button type="button" id="cancelSosCountdownBtn" class="btn-primary" style="background: #10b981; border-color: #10b981; font-weight: 800;">
-                ✓ CANCEL — I AM SAFE (STOP AUTO-CALL)
+                ✓ CANCEL • I AM SAFE
               </button>
               <a href="tel:108" id="sosDirectCall108" class="btn-emergency">📞 Call Saved Contact Now</a>
               <a href="tel:112" id="sosDirectCall112" class="btn-emergency btn-emergency--secondary">📞 Call 112 (ERSS)</a>
