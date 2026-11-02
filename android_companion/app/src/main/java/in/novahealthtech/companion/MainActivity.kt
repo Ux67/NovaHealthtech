@@ -596,10 +596,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadIndexHtmlWithPreInjectedEngine() {
         try {
             var rawHtml = assets.open("index.html").bufferedReader(Charsets.UTF_8).use { it.readText() }
-            rawHtml = rawHtml.replace(
-                Regex("Call\\s*108\\s*\\(Ambulance\\)", RegexOption.IGNORE_CASE),
-                "Save SOS Number"
-            )
+            // Preserve the visible emergency-service label: Call 108.
             rawHtml = rawHtml.replace(
                 Regex("automatic\\s*108\\s*phone\\s*call", RegexOption.IGNORE_CASE),
                 "automatic emergency phone call"
@@ -612,10 +609,7 @@ class MainActivity : AppCompatActivity() {
                 Regex("CALLING\\s*AMBULANCE\\s*\\(108\\)", RegexOption.IGNORE_CASE),
                 "OPENING EMERGENCY DIALER"
             )
-            rawHtml = rawHtml.replace(
-                Regex("Call\\s*108\\s*Immediately", RegexOption.IGNORE_CASE),
-                "Call Saved Contact Now"
-            )
+            // Saved-contact SOS action is labeled separately in the countdown UI.
 
             val scriptTag = "<script>\n" + buildStandaloneEngineScript() + "\n</script>"
             val patchedHtml = if (rawHtml.contains("<head>", ignoreCase = true)) {
@@ -1405,20 +1399,7 @@ class MainActivity : AppCompatActivity() {
                     ).join("");
                 };
 
-                const origAnchorClick = HTMLAnchorElement.prototype.click;
-                HTMLAnchorElement.prototype.click = function() {
-                    const h = (this.getAttribute('href') || this.href || '').trim();
-                    if (h.toLowerCase() === 'tel:108') {
-                        const saved = window.__getSavedSosAutoCallNumber();
-                        if (!saved) {
-                            window.__callDbEmergencyNumberNow();
-                            return;
-                        }
-                        this.setAttribute('href', 'tel:' + saved);
-                        this.href = 'tel:' + saved;
-                    }
-                    return origAnchorClick.apply(this, arguments);
-                };
+                // Do not globally rewrite tel:108 links. The emergency bar must always call 108.
 
                 async function gtxTranslate(text, targetLang) {
                     if (!text || !targetLang || targetLang === 'en') return text;
